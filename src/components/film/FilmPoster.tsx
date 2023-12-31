@@ -2,8 +2,9 @@ import { Card, CardFooter, Image, Button } from '@nextui-org/react';
 import { DropdownMenuIcon } from '@/components/Icons';
 
 import { Film } from '@/lib/types';
-import clsx from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
+// TODO: Move movie info to the bottom of the poster
 export default function FilmPoster({
   film,
   className,
@@ -12,7 +13,7 @@ export default function FilmPoster({
   className?: string;
 }) {
   return (
-    <div className={clsx('aspect-[9/13.5]', className)}>
+    <div className={twMerge('aspect-[2/3]', className)}>
       <Card isFooterBlurred radius="lg" className="border-none">
         <Image
           src={film.poster}

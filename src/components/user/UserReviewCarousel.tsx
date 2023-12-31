@@ -11,11 +11,15 @@ import {
   CarouselPrevious,
   CarouselApi,
 } from '@/components/ui/carousel';
-import FilmPoster from '@/components/film/FilmPoster';
+import UserReview from '@/components/user/UserReview';
 
-import { Film } from '@/lib/types';
+import { FilmReview, SeriesReview, SeasonReview } from '@/lib/types';
 
-export default function FilmCarousel({ films }: { films: Film[] }) {
+export default function UserReviewCarousel({
+  reviews,
+}: {
+  reviews: FilmReview[] | SeriesReview[] | SeasonReview[];
+}) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
@@ -48,12 +52,12 @@ export default function FilmCarousel({ films }: { films: Film[] }) {
       className="ml-8 mr-8"
     >
       <CarouselContent>
-        {films.map((film) => (
+        {reviews.map((review) => (
           <CarouselItem
-            key={film.title}
-            className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
+            key={review.id}
+            className="flex justify-center items-center sm:basis-1/2 lg:basis-1/3 2xl:basis-1/4"
           >
-            <FilmPoster film={film} />
+            <UserReview review={review} className="m-4" />
           </CarouselItem>
         ))}
       </CarouselContent>

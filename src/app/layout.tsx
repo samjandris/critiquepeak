@@ -25,7 +25,7 @@ export default function RootLayout({
         <Providers>
           <Navigation />
           <div className="flex justify-center">
-            <div className="w-full max-w-[100rem]">{children}</div>
+            <div className="w-full max-w-screen-2xl">{children}</div>
           </div>
         </Providers>
       </body>

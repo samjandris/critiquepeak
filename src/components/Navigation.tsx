@@ -1,6 +1,5 @@
 'use client';
 
-// import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import {
   Navbar,
@@ -39,9 +38,7 @@ export default function Navigation() {
       <NavbarBrand>
         <Link color="foreground" href="/">
           <CritiquePeakLogo />
-          <p className="font-bold text-inherit ml-2 [&:not(:first-child)]:mt-0">
-            CritiquePeak
-          </p>
+          <p className="font-bold text-inherit ml-2">CritiquePeak</p>
         </Link>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">

@@ -13,6 +13,7 @@ import {
 import { StarRating } from '@/components/StarRating';
 
 import { FilmReview, SeriesReview, SeasonReview } from '@/lib/types';
+import { truncateNumber } from '@/lib/misc';
 import { twMerge } from 'tailwind-merge';
 
 export default function UserReview({
@@ -88,33 +89,17 @@ export default function UserReview({
       <CardFooter className="gap-3">
         <div className="flex gap-1">
           <p className="font-semibold text-default-400 text-small">
-            {formatNumber(review.reviewedBy.following)}
+            {truncateNumber(review.reviewedBy.following)}
           </p>
           <p className=" text-default-400 text-small">Following</p>
         </div>
         <div className="flex gap-1">
           <p className="font-semibold text-default-400 text-small">
-            {formatNumber(review.reviewedBy.followers)}
+            {truncateNumber(review.reviewedBy.followers)}
           </p>
           <p className="text-default-400 text-small">Followers</p>
         </div>
       </CardFooter>
     </Card>
   );
-}
-
-function formatNumber(num: number) {
-  if (num < 1000) {
-    return num;
-  }
-
-  if (num < 1000000) {
-    return (num / 1000).toFixed(1) + 'K';
-  }
-
-  if (num < 1000000000) {
-    return (num / 1000000).toFixed(1) + 'M';
-  }
-
-  return (num / 1000000000).toFixed(1) + 'B';
 }

@@ -55,7 +55,7 @@ export default function UserReviewCarousel({
         {reviews.map((review) => (
           <CarouselItem
             key={review.id}
-            className="flex justify-center items-center sm:basis-1/2 lg:basis-1/3 2xl:basis-1/4"
+            className="flex justify-center items-center min-[825px]:basis-1/2 min-[1225px]:basis-1/3 2xl:basis-1/4"
           >
             <UserReview review={review} className="m-4" />
           </CarouselItem>

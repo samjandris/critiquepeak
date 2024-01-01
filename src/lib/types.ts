@@ -8,8 +8,16 @@ export interface User {
 }
 
 export interface Film {
+  id: number;
   title: string;
+  overview: string;
   poster: string;
+  backdrop: string;
+  releaseDate: Date;
+  averageRating: number;
+  tagline?: string;
+  runtime?: number;
+  budget?: number;
 }
 
 export interface Review {

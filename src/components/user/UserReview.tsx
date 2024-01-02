@@ -60,7 +60,7 @@ export default function UserReview({
         </Button>
       </CardHeader>
       <CardBody className="px-3 py-0 text-small text-default-400">
-        <div className="flex gap-2 mb-1">
+        <div className="flex gap-2 mb-3">
           <Chip size="sm">
             {(review as FilmReview).film
               ? 'Film'
@@ -84,7 +84,7 @@ export default function UserReview({
             {review.rating.toFixed(1)}
           </Chip>
         </div>
-        <p>{review.review}</p>
+        <p className="leading-normal">{review.review}</p>
       </CardBody>
       <CardFooter className="gap-3">
         <div className="flex gap-1">

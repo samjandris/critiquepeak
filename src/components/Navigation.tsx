@@ -11,7 +11,14 @@ import {
   NavbarMenuToggle,
   NavbarMenu,
   NavbarMenuItem,
+  Dropdown,
+  DropdownTrigger,
+  Avatar,
+  DropdownMenu,
+  DropdownItem,
 } from '@nextui-org/react';
+
+import { useAuth } from '@/components/AuthProvider';
 import { CritiquePeakLogo } from '@/components/Icons';
 
 const links = [
@@ -31,6 +38,7 @@ const links = [
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { user, userLoaded, signOut } = useAuth();
 
   return (
     <Navbar isBordered>
@@ -50,15 +58,58 @@ export default function Navigation() {
           </NavbarItem>
         ))}
       </NavbarContent>
-      <NavbarContent justify="end">
-        <NavbarItem className="">
-          <Link href="/login">Login</Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Button as={Link} color="primary" href="/signup" variant="flat">
-            Sign Up
-          </Button>
-        </NavbarItem>
+      <NavbarContent
+        justify="end"
+        data-userloaded={userLoaded}
+        className="opacity-0 data-[userloaded=true]:opacity-100 transition-all"
+      >
+        {user ? (
+          <NavbarContent as="div" justify="end">
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Avatar
+                  isBordered
+                  as="button"
+                  size="sm"
+                  src="https://i.pravatar.cc/150"
+                  color="success"
+                  className="transition-transform"
+                />
+              </DropdownTrigger>
+              <DropdownMenu variant="flat">
+                <DropdownItem isReadOnly className="pointer-events-none">
+                  <p className="font-semibold leading-tight">
+                    {`${user.user_metadata.firstName} ${user.user_metadata.lastName}`}
+                  </p>
+                  <p className="font-semibold leading-tight">
+                    {`@${user.user_metadata.username}`}
+                  </p>
+                </DropdownItem>
+                <DropdownItem href="/profile">Profile</DropdownItem>
+                <DropdownItem href="/profile/settings">Settings</DropdownItem>
+                <DropdownItem
+                  color="danger"
+                  onPress={() => {
+                    signOut();
+                  }}
+                >
+                  Log Out
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </NavbarContent>
+        ) : (
+          <>
+            <NavbarItem className="">
+              <Link href="/login">Login</Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Button as={Link} color="primary" href="/signup" variant="flat">
+                Sign Up
+              </Button>
+            </NavbarItem>
+          </>
+        )}
       </NavbarContent>
 
       <NavbarMenu>

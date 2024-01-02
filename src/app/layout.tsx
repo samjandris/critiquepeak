@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { Providers } from '@/app/providers';
-
-import Navigation from '@/components/Navigation';
+import { UIProvider } from '@/components/UIProvider';
+import { AuthProvider } from '@/components/AuthProvider';
 
 import '@/styles/globals.css';
 import '@/styles/typography.css';
@@ -22,12 +21,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="light">
       <body className={inter.className}>
-        <Providers>
-          <Navigation />
-          <div className="flex justify-center">
-            <div className="w-full max-w-screen-2xl">{children}</div>
-          </div>
-        </Providers>
+        <UIProvider>
+          <AuthProvider>
+            <div className="flex justify-center">
+              <div className="w-full max-w-screen-2xl">{children}</div>
+            </div>
+          </AuthProvider>
+        </UIProvider>
       </body>
     </html>
   );

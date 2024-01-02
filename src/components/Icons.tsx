@@ -154,3 +154,61 @@ export function StarFillIcon(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function EmailIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      height={iconSize}
+      width={iconSize}
+      {...props}
+    >
+      <path d="M20 8l-8 5-8-5V6l8 5 8-5m0-2H4c-1.11 0-2 .89-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2z" />
+    </svg>
+  );
+}
+
+export function PasswordIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      fill="none"
+      viewBox="0 0 15 15"
+      height={iconSize}
+      width={iconSize}
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        d="M11 11h-1v-1h1v1zM8 11h1v-1H8v1zM13 11h-1v-1h1v1z"
+      />
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M3 6V3.5a3.5 3.5 0 117 0V6h1.5A1.5 1.5 0 0113 7.5v.55a2.5 2.5 0 010 4.9v.55a1.5 1.5 0 01-1.5 1.5h-10A1.5 1.5 0 010 13.5v-6A1.5 1.5 0 011.5 6H3zm1-2.5a2.5 2.5 0 015 0V6H4V3.5zM8.5 9a1.5 1.5 0 100 3h4a1.5 1.5 0 000-3h-4z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+export function ChevronBackIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 512 512"
+      fill="currentColor"
+      height={iconSize}
+      width={iconSize}
+      {...props}
+    >
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={48}
+        d="M328 112L184 256l144 144"
+      />
+    </svg>
+  );
+}

@@ -4,6 +4,7 @@ import {
   StarOutlineIcon,
   StarPartialIcon,
 } from '@/components/Icons';
+import { twMerge } from 'tailwind-merge';
 
 export function StarRating({ rating }: { rating: number }) {
   const stars = [];
@@ -21,23 +22,37 @@ export function StarRating({ rating }: { rating: number }) {
   return <div className="flex gap-0.5">{stars.map((star) => star)}</div>;
 }
 
-export function StarRatingPrecise({ rating }: { rating: number }) {
+export function StarRatingPrecise({
+  rating,
+  className,
+}: {
+  rating: number;
+  className?: string;
+}) {
   const stars = [];
   const totalStars = 5;
   const fullStars = Math.floor(rating);
-  const partialFill = Math.round((rating % 1) * 100); // % of star that should be filled
+  const partialFill = Math.round((rating % 1) * 100);
 
   for (let i = 0; i < fullStars; i++) {
-    stars.push(<StarFillIcon key={`full-${i}`} />);
+    stars.push(<StarFillIcon key={`full-${i}`} className="w-full h-auto" />);
   }
 
   if (partialFill > 0 && partialFill < 100) {
-    stars.push(<StarPartialIcon key="partial" fillPercentage={partialFill} />);
+    stars.push(
+      <StarPartialIcon
+        key="partial"
+        fillPercentage={partialFill}
+        className="w-full h-auto"
+      />
+    );
   }
 
   for (let i = stars.length; i < totalStars; i++) {
-    stars.push(<StarFillIcon key={`full-${i}`} fill="gray" />);
+    stars.push(
+      <StarFillIcon key={`full-${i}`} fill="gray" className="w-full h-auto" />
+    );
   }
 
-  return <div className="flex gap-0.5">{stars}</div>;
+  return <div className={twMerge('flex gap-0.5', className)}>{stars}</div>;
 }

@@ -1,6 +1,6 @@
-import Image from 'next/image';
+import NextImage from 'next/image';
 
-import { Chip } from '@nextui-org/react';
+import { Image, Chip } from '@nextui-org/react';
 import { StarRatingPrecise } from '@/components/StarRating';
 
 import { getMovie } from '@/lib/film';
@@ -12,53 +12,56 @@ export default async function FilmDetails({
   params: { filmId: string };
 }) {
   const filmDetails = await getMovie(params.filmId, {
-    posterSize: 'w780',
+    posterSize: 'w500',
     backdropSize: 'w1280',
   });
 
   return (
-    <div className="p-8 flex flex-col gap-6">
-      <div className="flex gap-6">
-        <Image
-          src={filmDetails.poster}
-          alt={'Poster for the film ' + filmDetails.title}
-          width={342}
-          height={513}
-          className="rounded-xl shadow-gray-400 shadow-xl"
-        />
+    <div className="p-8 grid grid-cols-4 gap-5">
+      <Image
+        as={NextImage}
+        src={filmDetails.poster}
+        alt={'Poster for the film ' + filmDetails.title}
+        width={0}
+        height={0}
+        sizes="100vw"
+        shadow="md"
+        isBlurred
+        className="w-full h-auto"
+      />
 
-        <div className="flex flex-col h-[513px] justify-center">
-          <h1 className="text-3xl font-bold">{filmDetails.title}</h1>
-          <p className="text-gray-500">{filmDetails.overview}</p>
+      <div className="col-span-2 flex flex-col gap-2 justify-center">
+        <h1 className="text-3xl font-bold">{filmDetails.title}</h1>
 
-          <div className="flex flex-row mt-8">
-            <div className="flex flex-col mr-8">
-              <h2 className="text-gray-500">Release date</h2>
-              <p>{getOrdinalDate(filmDetails.releaseDate)}</p>
-            </div>
-
-            <div className="flex flex-col mr-8">
-              <h2 className="text-gray-500">Rating</h2>
-
-              <StarRatingPrecise rating={filmDetails.averageRating} />
-            </div>
-
-            <div className="flex flex-col mr-8">
-              <h2 className="text-gray-500">Runtime</h2>
-              <p>{filmDetails.runtime} minutes</p>
-            </div>
-
-            <div className="flex flex-col mr-8">
-              <h2 className="text-gray-500">Budget</h2>
-              <p>{truncateNumber(filmDetails.budget)}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="flex w-[342px] justify-center">
         <Chip color="warning" variant="flat" size="sm">
           {filmDetails.tagline}
         </Chip>
+
+        <p className="text-gray-500">{filmDetails.overview}</p>
+      </div>
+
+      <div className="flex flex-col justify-center gap-4">
+        <div>
+          <h3 className="text-gray-500">Release date</h3>
+          <p>{getOrdinalDate(filmDetails.releaseDate)}</p>
+        </div>
+
+        <div>
+          <h3 className="text-gray-500">Runtime</h3>
+          <p>{filmDetails.runtime} minutes</p>
+        </div>
+
+        <div>
+          <h3 className="text-gray-500">Budget</h3>
+          <p>{truncateNumber(filmDetails.budget)}</p>
+        </div>
+      </div>
+
+      <div className="flex justify-center">
+        <StarRatingPrecise
+          rating={filmDetails.averageRating}
+          className="w-[65%] h-auto"
+        />
       </div>
     </div>
   );

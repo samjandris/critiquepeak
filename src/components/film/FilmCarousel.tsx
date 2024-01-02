@@ -53,7 +53,7 @@ export default function FilmCarousel({ films }: { films: Film[] }) {
             key={film.title}
             className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
           >
-            <FilmPoster film={film} />
+            <FilmPoster film={film} className="m-4" />
           </CarouselItem>
         ))}
       </CarouselContent>

@@ -94,6 +94,7 @@ export function StarPartialIcon({
   ...props
 }: {
   fillPercentage: number;
+  [x: string]: any;
 }) {
   return (
     <svg

@@ -57,7 +57,7 @@ export default function UserReviewCarousel({
             key={review.id}
             className="flex justify-center items-center min-[825px]:basis-1/2 min-[1225px]:basis-1/3 2xl:basis-1/4"
           >
-            <UserReview review={review} className="m-4" />
+            <UserReview review={review} className="m-6" />
           </CarouselItem>
         ))}
       </CarouselContent>

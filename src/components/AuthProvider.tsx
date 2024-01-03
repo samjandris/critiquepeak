@@ -71,11 +71,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await createUser({
         id: user.id,
         username,
-        avatar: 'https://i.pravatar.cc/150',
         first_name: firstName,
         last_name: lastName,
-        following: [],
         created_at: user.created_at,
+        following: [],
       });
     } else {
       console.error('User was NOT created properly');

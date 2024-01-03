@@ -101,8 +101,9 @@ export default function Navigation() {
                     {`@${username}`}
                   </p>
                 </DropdownItem>
-                <DropdownItem href="/profile">Profile</DropdownItem>
-                <DropdownItem href="/profile/settings">Settings</DropdownItem>
+                <DropdownItem href={'/profile/' + username}>
+                  Profile
+                </DropdownItem>
                 <DropdownItem
                   color="danger"
                   onPress={() => {

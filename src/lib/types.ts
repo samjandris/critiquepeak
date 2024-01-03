@@ -1,12 +1,15 @@
-export interface User {
+export interface UserDB {
   id: string;
   username: string;
   first_name: string;
   last_name: string;
-  avatar: string;
   created_at: string;
   following: [];
-  followers?: number;
+}
+
+export interface User extends UserDB {
+  avatar: string;
+  followers: number;
 }
 
 export interface Film {

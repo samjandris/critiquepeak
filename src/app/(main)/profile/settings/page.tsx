@@ -1,16 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Button, Input, Skeleton } from '@nextui-org/react';
+import { useState, useEffect, useRef, ChangeEvent } from 'react';
+import { Avatar, Button, Input, Skeleton } from '@nextui-org/react';
 import { useAuth } from '@/components/AuthProvider';
+import { getClient } from '@/lib/supabase';
 import { getUser, updateUser } from '@/lib/users';
 
-export default function ProfileSettingsPage() {
-  const { authLoaded, auth, user } = useAuth();
+const supabase = getClient();
 
+export default function ProfileSettingsPage() {
+  const { auth, user } = useAuth();
+
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
+  const [avatar, setAvatar] = useState('');
+
+  const uploadRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -20,14 +27,54 @@ export default function ProfileSettingsPage() {
       setFirstName(res.first_name);
       setLastName(res.last_name);
       setUsername(res.username);
+      setAvatar(res.avatar);
+      setDataLoaded(true);
     });
   }, [user]);
+
+  async function uploadAvatar(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files![0];
+    setAvatar(URL.createObjectURL(file));
+
+    const { error } = await supabase.storage
+      .from('avatars')
+      .upload(`${user?.id}/profile.png`, file, {
+        upsert: true,
+      });
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+  }
 
   return (
     <div className="flex flex-col justify-center items-center h-[90vh] gap-4">
       <h1 className="mt-1 text-4xl">Profile Settings</h1>
-      <div className="grid grid-cols-2 gap-2">
-        <Skeleton isLoaded={authLoaded} className="rounded-lg">
+      <div className="grid grid-cols-2 gap-2 w-72">
+        <div className="col-span-2 mb-2 flex justify-center">
+          <Skeleton isLoaded={dataLoaded} className="rounded-full">
+            <Avatar
+              size="lg"
+              name={`${firstName.charAt(0)}${lastName.charAt(0)}`}
+              src={avatar}
+              isIconOnly
+              as={Button}
+              onPress={() => {
+                uploadRef.current?.click();
+              }}
+            />
+            <input
+              ref={uploadRef}
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={uploadAvatar}
+            />
+          </Skeleton>
+        </div>
+
+        <Skeleton isLoaded={dataLoaded} className="rounded-lg">
           <Input
             type="text"
             label="First Name"
@@ -35,7 +82,7 @@ export default function ProfileSettingsPage() {
             onChange={(e) => setFirstName(e.target.value)}
           />
         </Skeleton>
-        <Skeleton isLoaded={authLoaded} className="rounded-lg">
+        <Skeleton isLoaded={dataLoaded} className="rounded-lg">
           <Input
             type="text"
             label="Last Name"
@@ -44,7 +91,7 @@ export default function ProfileSettingsPage() {
           />
         </Skeleton>
 
-        <Skeleton isLoaded={authLoaded} className="col-span-2 rounded-lg">
+        <Skeleton isLoaded={dataLoaded} className="col-span-2 rounded-lg">
           <Input
             type="text"
             label="Username"
@@ -54,7 +101,7 @@ export default function ProfileSettingsPage() {
         </Skeleton>
 
         <Button
-          isDisabled={!authLoaded}
+          isDisabled={!dataLoaded}
           onPress={() => {
             updateUser(user!.id, {
               username,

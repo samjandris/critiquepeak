@@ -37,7 +37,7 @@ export default function UserReview({
           />
           <div className="flex flex-col gap-1 items-start justify-center">
             <h4 className="text-small font-semibold leading-none text-default-600">
-              {review.reviewedBy.name}
+              {review.reviewedBy.first_name} {review.reviewedBy.last_name}
             </h4>
             <h5 className="text-small tracking-tight text-default-400">
               @{review.reviewedBy.username}
@@ -89,13 +89,13 @@ export default function UserReview({
       <CardFooter className="gap-3">
         <div className="flex gap-1">
           <p className="font-semibold text-default-400 text-small">
-            {truncateNumber(review.reviewedBy.following)}
+            {truncateNumber(review.reviewedBy.following.length)}
           </p>
           <p className=" text-default-400 text-small">Following</p>
         </div>
         <div className="flex gap-1">
           <p className="font-semibold text-default-400 text-small">
-            {truncateNumber(review.reviewedBy.followers)}
+            {truncateNumber(review.reviewedBy.followers!)}
           </p>
           <p className="text-default-400 text-small">Followers</p>
         </div>

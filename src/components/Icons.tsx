@@ -1,4 +1,4 @@
-const iconSize = '1.5em';
+const iconSize = '1em';
 
 export function CritiquePeakLogo(props: React.SVGProps<SVGSVGElement>) {
   return (

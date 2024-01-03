@@ -4,22 +4,21 @@ import { redirect } from 'next/navigation';
 import React, {
   createContext,
   useContext,
-  useEffect,
   useState,
+  useEffect,
   ReactNode,
+  Suspense,
 } from 'react';
 
-import { createBrowserClient } from '@supabase/ssr';
+import { getClient } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 
-const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { createUser } from '@/lib/users';
 
 type AuthContextType = {
+  auth: typeof supabase.auth;
   user: User | null;
-  userLoaded: boolean;
+  authLoaded: boolean;
   signIn: (formData: FormData) => void;
   signOut: () => void;
   signUp: (formData: FormData) => void;
@@ -27,8 +26,10 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>(null!);
 
+const supabase = getClient();
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [userLoaded, setUserLoaded] = useState(false);
+  const [authLoaded, setAuthLoaded] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user || null);
-        setUserLoaded(true);
+        setAuthLoaded(true);
       }
     );
 
@@ -56,20 +57,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const firstName = formData.get('firstName') as string;
     const lastName = formData.get('lastName') as string;
 
-    const { error } = await supabase.auth.signUp({
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: {
-          username,
-          firstName,
-          lastName,
-        },
-      },
     });
 
-    if (error) {
+    if (authError) {
       return redirect('/signup?message=Could not authenticate user');
+    } else if (user) {
+      await createUser({
+        id: user.id,
+        username,
+        avatar: 'https://i.pravatar.cc/150',
+        first_name: firstName,
+        last_name: lastName,
+        following: [],
+        created_at: user.created_at,
+      });
+    } else {
+      console.error('User was NOT created properly');
+
+      return redirect('/signup?message=Could not create user in database');
     }
 
     return redirect('/signup?message=Check email to continue sign in process');
@@ -97,8 +108,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, userLoaded, signUp, signIn, signOut }}>
-      {children}
+    <AuthContext.Provider
+      value={{
+        authLoaded,
+        auth: supabase.auth,
+        user,
+        signUp,
+        signIn,
+        signOut,
+      }}
+    >
+      <Suspense>{children}</Suspense>
     </AuthContext.Provider>
   );
 }

@@ -1,10 +1,12 @@
 export interface User {
   id: string;
   username: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   avatar: string;
-  following: number;
-  followers: number;
+  created_at: string;
+  following: [];
+  followers?: number;
 }
 
 export interface Film {

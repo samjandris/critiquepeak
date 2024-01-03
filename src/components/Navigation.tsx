@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import {
   Navbar,
   NavbarBrand,
@@ -21,6 +22,8 @@ import {
 import { useAuth } from '@/components/AuthProvider';
 import { CritiquePeakLogo } from '@/components/Icons';
 
+import { getUser } from '@/lib/users';
+
 const links = [
   {
     name: 'Film',
@@ -37,8 +40,23 @@ const links = [
 ];
 
 export default function Navigation() {
+  const { user, authLoaded, signOut } = useAuth();
   const pathname = usePathname();
-  const { user, userLoaded, signOut } = useAuth();
+
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+
+  useEffect(() => {
+    if (!user) return;
+
+    getUser(user.id).then((res) => {
+      if (!res) return;
+      setName(`${res.first_name} ${res.last_name}`);
+      setUsername(res.username);
+      setAvatarUrl(res.avatar);
+    });
+  }, [user]);
 
   return (
     <Navbar isBordered>
@@ -60,8 +78,8 @@ export default function Navigation() {
       </NavbarContent>
       <NavbarContent
         justify="end"
-        data-userloaded={userLoaded}
-        className="opacity-0 data-[userloaded=true]:opacity-100 transition-all"
+        data-authloaded={authLoaded}
+        className="pointer-events-none opacity-0 data-[authloaded=true]:pointer-events-auto data-[authloaded=true]:opacity-100 transition-all"
       >
         {user ? (
           <NavbarContent as="div" justify="end">
@@ -71,18 +89,16 @@ export default function Navigation() {
                   isBordered
                   as="button"
                   size="sm"
-                  src="https://i.pravatar.cc/150"
+                  src={avatarUrl}
                   color="success"
                   className="transition-transform"
                 />
               </DropdownTrigger>
               <DropdownMenu variant="flat">
                 <DropdownItem isReadOnly className="pointer-events-none">
+                  <p className="font-semibold leading-tight">{name}</p>
                   <p className="font-semibold leading-tight">
-                    {`${user.user_metadata.firstName} ${user.user_metadata.lastName}`}
-                  </p>
-                  <p className="font-semibold leading-tight">
-                    {`@${user.user_metadata.username}`}
+                    {`@${username}`}
                   </p>
                 </DropdownItem>
                 <DropdownItem href="/profile">Profile</DropdownItem>

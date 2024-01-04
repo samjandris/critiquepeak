@@ -15,6 +15,23 @@ export async function createUser(user: UserDB) {
   }
 }
 
+export async function getUserIdByUsername(username: string): Promise<string> {
+  const supabase = getServer(cookies());
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('id')
+    .eq('username', username)
+    .limit(1);
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+
+  return data[0].id;
+}
+
 export async function getUser(id: string): Promise<User> {
   const supabase = getServer(cookies());
 
@@ -37,55 +54,19 @@ export async function getUser(id: string): Promise<User> {
       .getPublicUrl(`${id}/profile.png`);
 
     user.avatar = avatarData.publicUrl;
+
+    const response = await fetch(user.avatar, {
+      method: 'HEAD',
+    });
+
+    if (!response.ok) {
+      user.avatar = 'https://source.boringavatars.com/beam/' + user.id;
+    }
+
     user.followers = await getFollowerCount(id);
   } catch (error) {}
 
   return user;
-}
-
-export async function getUserByUsername(username: string): Promise<User> {
-  const supabase = getServer(cookies());
-
-  const { data, error } = await supabase
-    .from('users')
-    .select()
-    .eq('username', username)
-    .limit(1);
-
-  if (error) {
-    console.error(error);
-    throw error;
-  }
-
-  const user = data ? data[0] : null;
-
-  try {
-    const { data: avatarData } = await supabase.storage
-      .from('avatars')
-      .getPublicUrl(`${user.id}/profile.png`);
-
-    user.avatar = avatarData.publicUrl;
-    user.followers = await getFollowerCount(user.id);
-  } catch (error) {}
-
-  return user;
-}
-
-export async function getUserIdByUsername(username: string): Promise<string> {
-  const supabase = getServer(cookies());
-
-  const { data, error } = await supabase
-    .from('users')
-    .select('id')
-    .eq('username', username)
-    .limit(1);
-
-  if (error) {
-    console.error(error);
-    throw error;
-  }
-
-  return data[0].id;
 }
 
 export async function isUserFollowing(userId: string, toCheck: string) {
@@ -183,4 +164,21 @@ export async function unfollowUser(userId: string, toUnfollow: string) {
   }
 
   return;
+}
+
+export async function getFollowerIds(id: string) {
+  const supabase = getServer(cookies());
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('id')
+    .filter('following', 'cs', `{${id}}`);
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+
+  const ids = data.map((user) => user.id);
+  return ids;
 }

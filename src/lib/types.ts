@@ -4,7 +4,7 @@ export interface UserDB {
   first_name: string;
   last_name: string;
   created_at: string;
-  following: [];
+  following: string[];
 }
 
 export interface User extends UserDB {

@@ -68,7 +68,16 @@ export default function UserReview({
               ? 'TV Season'
               : 'TV Series'}
           </Chip>
-          <Chip size="sm">
+          <Chip
+            color={
+              review.rating >= 3.5
+                ? 'success'
+                : review.rating >= 2
+                ? 'warning'
+                : 'danger'
+            }
+            size="sm"
+          >
             <StarRating rating={review.rating} />
           </Chip>
           <Chip

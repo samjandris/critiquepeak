@@ -1,11 +1,11 @@
 'use client';
 
-import NextImage from 'next/image';
+import Image from 'next/image';
 
 import { useState, useEffect, ChangeEvent, useRef } from 'react';
+import useSWR from 'swr';
 import {
   Spinner,
-  Image,
   Skeleton,
   Card,
   CardBody,
@@ -24,13 +24,12 @@ import { useAuth } from '@/components/AuthProvider';
 
 import { getClient } from '@/lib/supabase';
 import {
+  getUserIdByUsername,
   getUser,
-  getFollowerCount,
-  getUserByUsername,
   followUser,
-  isUserFollowing,
   unfollowUser,
   updateUser,
+  getFollowerIds,
 } from '@/lib/users';
 
 const supabase = getClient();
@@ -41,152 +40,181 @@ export default function ProfilePage({
   params: { userId: string };
 }) {
   const username = params.userId;
-  const { authLoaded, auth, user } = useAuth();
-
-  const [dataLoaded, setDataLoaded] = useState(false);
-  const [userExists, setUserExists] = useState(false);
-  const [userId, setUserId] = useState('');
-  const [name, setName] = useState('abcdefghijkl');
-  const [avatar, setAvatar] = useState('');
-
-  const [followerCount, setFollowerCount] = useState(0);
-  const [followingCount, setFollowingCount] = useState(0);
-
-  const [authUserFollowing, setAuthUserFollowing] = useState(false);
-  const [userFollowingAuth, setUserFollowingAuth] = useState(false);
-  const [followButtonLoaded, setFollowButtonLoaded] = useState(false);
+  const { user } = useAuth();
 
   const [followingModalOpen, setFollowingModalOpen] = useState(false);
   const [followersModalOpen, setFollowersModalOpen] = useState(false);
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
 
-  useEffect(() => {
-    getUserByUsername(username).then((res) => {
-      if (res) {
-        setUserId(res.id);
-        setName(`${res.first_name} ${res.last_name}`);
-        setAvatar(res.avatar);
-        setFollowingCount(res.following.length);
-        setFollowerCount(res.followers);
-        setUserExists(true);
+  const { data: userId, isLoading: userIdIsLoading } = useSWR(
+    username ? ['user', username] : null,
+    () => getUserIdByUsername(username)
+  );
 
-        if (user) {
-          isUserFollowing(user.id, res.id).then((userFollowing) => {
-            setAuthUserFollowing(userFollowing);
-          });
+  const {
+    data: userData,
+    error: userError,
+    isLoading: userDataIsLoading,
+    mutate: mutateUser,
+  } = useSWR(userId && ['user', userId], () => {
+    if (!userId) return;
+    return getUser(userId);
+  });
 
-          isUserFollowing(res.id, user.id).then((userFollows) => {
-            setUserFollowingAuth(userFollows);
-            setFollowButtonLoaded(true);
-          });
-        }
-      }
+  const {
+    data: authUserData,
+    error: authUserError,
+    isLoading: authUserDataIsLoading,
+    mutate: mutateAuthUser,
+  } = useSWR(['user', user?.id], () => user && getUser(user.id));
 
-      setDataLoaded(true);
-    });
-  }, [username, user]);
+  if (userIdIsLoading || userDataIsLoading || authUserDataIsLoading) {
+    return (
+      <div className="flex justify-center items-center h-[90vh]">
+        <Spinner color="default" size="lg" />
+      </div>
+    );
+  }
 
-  return authLoaded && dataLoaded ? (
-    userExists ? (
+  if (userError || authUserError) {
+    return (
+      <div className="flex justify-center items-center h-[90vh]">
+        <Card>
+          <CardBody>
+            <p>{userError?.message}</p>
+            <p>{authUserError?.message}</p>
+          </CardBody>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="flex justify-center items-center h-[90vh]">
+        <Card>
+          <CardBody>
+            <p>User not found.</p>
+          </CardBody>
+        </Card>
+      </div>
+    );
+  } else {
+    return (
       <div className="grid grid-cols-4 gap-4 p-8">
         <div className="flex flex-col items-center gap-4">
-          {dataLoaded && (
-            <div className="">
-              <Image
-                as={NextImage}
-                src={avatar}
-                alt={'Profile picture for ' + username}
-                width={200}
-                height={200}
-                sizes="100vw"
-                shadow="md"
-                isBlurred
-                isLoading={!dataLoaded}
-                radius="full"
-                className="w-full h-auto"
-              />
-            </div>
-          )}
+          <Skeleton
+            isLoaded={!userDataIsLoading}
+            className="w-[100px] h-[100px] md:w-[200px] md:h-[200px] lg:w-[250px] lg:h-[250px] rounded-full shadow-md shadow-black"
+          >
+            <Image
+              src={userData.avatar}
+              alt={'Profile picture for ' + userData.username}
+              fill
+              className="object-cover"
+            />
+          </Skeleton>
 
-          <Skeleton isLoaded={dataLoaded}>
+          <Skeleton isLoaded={!userDataIsLoading}>
             <div className="text-center">
-              <h1 className="text-3xl font-bold">{name}</h1>
+              <h1 className="text-3xl font-bold">
+                {userData.first_name} {userData.last_name}
+              </h1>
               <div className="flex justify-center items-center gap-3">
-                <p className="text-gray-500 leading-tight">@{username}</p>
-                {userFollowingAuth && (
-                  <Chip size="sm" variant="flat">
-                    Follows You
-                  </Chip>
-                )}
+                <p className="text-gray-500 leading-tight">
+                  @{userData.username}
+                </p>
+                {authUserData &&
+                  userData.following.includes(authUserData.id) && (
+                    <Chip size="sm" variant="flat">
+                      Follows You
+                    </Chip>
+                  )}
               </div>
             </div>
           </Skeleton>
 
-          <Skeleton isLoaded={dataLoaded}>
+          <Skeleton isLoaded={!userDataIsLoading}>
             <div className="flex gap-2">
-              <Button variant="light" size="sm">
-                {followerCount + ' Followers'}
+              <Button
+                variant="light"
+                size="sm"
+                onPress={() => setFollowersModalOpen(!followersModalOpen)}
+              >
+                {userData.followers + ' Followers'}
               </Button>
               <Button
                 variant="light"
                 size="sm"
                 onPress={() => setFollowingModalOpen(!followingModalOpen)}
               >
-                {followingCount + ' Following'}
+                {userData.following.length + ' Following'}
               </Button>
             </div>
           </Skeleton>
 
-          <Skeleton isLoaded={dataLoaded}>
-            {user &&
-              (user.id === userId ? (
-                <>
-                  <Button
-                    onPress={() =>
-                      setEditProfileModalOpen(!editProfileModalOpen)
-                    }
-                    className="w-full"
-                  >
-                    Edit Profile
-                  </Button>
-                </>
-              ) : (
+          <Skeleton isLoaded={!userDataIsLoading}>
+            {authUserData && userData.id === authUserData.id ? (
+              <>
                 <Button
                   size="sm"
-                  isLoading={!followButtonLoaded}
+                  onPress={() => setEditProfileModalOpen(!editProfileModalOpen)}
+                  className="w-full"
+                >
+                  Edit Profile
+                </Button>
+              </>
+            ) : (
+              authUserData && (
+                <Button
+                  size="sm"
                   onPress={() => {
-                    console.log('Follow user', userId);
-                    if (authUserFollowing) {
-                      unfollowUser(user.id, userId);
-                      setFollowerCount(followerCount - 1);
-                      setAuthUserFollowing(false);
-                    } else {
-                      followUser(user.id, userId);
-                      setFollowerCount(followerCount + 1);
-                      setAuthUserFollowing(true);
+                    if (authUserData) {
+                      if (authUserData.following.includes(userData.id)) {
+                        unfollowUser(authUserData.id, userData.id);
+                        mutateAuthUser({
+                          ...authUserData,
+                          following: authUserData.following.filter(
+                            (id) => id !== userData.id
+                          ),
+                        });
+                        mutateUser({
+                          ...userData,
+                          followers: userData.followers - 1,
+                        });
+                      } else {
+                        followUser(authUserData.id, userData.id);
+                        mutateAuthUser({
+                          ...authUserData,
+                          following: [...authUserData.following, userData.id],
+                        });
+                        mutateUser({
+                          ...userData,
+                          followers: userData.followers + 1,
+                        });
+                      }
                     }
                   }}
                   className="w-full"
                 >
-                  {followButtonLoaded
-                    ? authUserFollowing
-                      ? 'Unfollow'
-                      : 'Follow'
-                    : ''}
+                  {authUserData && authUserData.following.includes(userData.id)
+                    ? 'Unfollow'
+                    : 'Follow'}
                 </Button>
-              ))}
+              )
+            )}
           </Skeleton>
         </div>
 
         <UserListModal
           type="following"
-          userId={userId}
+          userId={userData.id}
           isOpen={followingModalOpen}
           setOpen={setFollowingModalOpen}
         />
         <UserListModal
           type="followers"
-          userId={userId}
+          userId={userData.id}
           isOpen={followersModalOpen}
           setOpen={setFollowersModalOpen}
         />
@@ -196,20 +224,8 @@ export default function ProfilePage({
           setOpen={setEditProfileModalOpen}
         />
       </div>
-    ) : (
-      <div className="flex justify-center items-center h-[90vh]">
-        <Card>
-          <CardBody>
-            <p>User does not exist.</p>
-          </CardBody>
-        </Card>
-      </div>
-    )
-  ) : (
-    <div className="flex justify-center items-center h-[90vh]">
-      <Spinner color="default" size="lg" />
-    </div>
-  );
+    );
+  }
 }
 
 function UserListModal({
@@ -223,50 +239,123 @@ function UserListModal({
   isOpen: boolean;
   setOpen: any;
 }) {
-  const [userList, setUserList] = useState<string[] | null>([]);
-
-  useEffect(() => {
+  const {
+    data: userList,
+    error: userListError,
+    isLoading: userListIsLoading,
+  } = useSWR([type, userId], () => {
     if (type === 'following') {
-      getUser(userId).then((res) => {
-        if (!res) return;
-        setUserList(res.following);
+      return getUser(userId).then((res) => {
+        return res.following;
       });
     } else {
-      // TODO: Get followers
-      // getFollowers(userId).then((res) => {
-      //   if (!res) return;
-      //   setUserList(res);
-      // });
+      return getFollowerIds(userId);
     }
-  }, [type, userId]);
+  });
 
-  return (
-    <Modal
-      isOpen={isOpen}
-      onOpenChange={() => setOpen(!isOpen)}
-      className="max-w-[350px]"
-    >
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">
-              {type === 'following' ? 'Following' : 'Followers'}
-            </ModalHeader>
-            <ModalBody>
-              {userList?.map((userId) => (
-                <UserChip key={userId} userId={userId} />
-              ))}
-            </ModalBody>
-            <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
-                Close
-              </Button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
-    </Modal>
-  );
+  if (userListIsLoading) {
+    return (
+      <Modal isOpen={isOpen} onOpenChange={() => setOpen(!isOpen)}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                {type === 'following' ? 'Following' : 'Followers'}
+              </ModalHeader>
+              <ModalBody>
+                <div className="flex justify-center items-center">
+                  <Spinner color="default" size="lg" />
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    );
+  }
+
+  if (userListError) {
+    return (
+      <Modal isOpen={isOpen} onOpenChange={() => setOpen(!isOpen)}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                {type === 'following' ? 'Following' : 'Followers'}
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-center">{userListError.message}</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    );
+  }
+
+  if (userList) {
+    if (userList.length === 0) {
+      return (
+        <Modal isOpen={isOpen} onOpenChange={() => setOpen(!isOpen)}>
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  {type === 'following' ? 'Following' : 'Followers'}
+                </ModalHeader>
+                <ModalBody>
+                  <p className="text-center">
+                    {type === 'following'
+                      ? 'This user is not following anyone.'
+                      : 'This user has no followers.'}
+                  </p>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="danger" variant="light" onPress={onClose}>
+                    Close
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+      );
+    } else {
+      return (
+        <Modal isOpen={isOpen} onOpenChange={() => setOpen(!isOpen)}>
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  {type === 'following' ? 'Following' : 'Followers'}
+                </ModalHeader>
+                <ModalBody>
+                  {userList?.map((userId) => (
+                    <UserChip key={userId} userId={userId} />
+                  ))}
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="danger" variant="light" onPress={onClose}>
+                    Close
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+      );
+    }
+  }
 }
 
 function EditProfileModal({
@@ -276,28 +365,30 @@ function EditProfileModal({
   isOpen: boolean;
   setOpen: any;
 }) {
-  const { auth, user } = useAuth();
+  const { user } = useAuth();
 
-  const [dataLoaded, setDataLoaded] = useState(false);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [username, setUsername] = useState('');
-  const [avatar, setAvatar] = useState('');
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState<string | null>(null);
+  const [lastName, setLastName] = useState<string | null>(null);
 
-  const uploadRef = useRef<HTMLInputElement>(null);
+  const {
+    data: authUserData,
+    error: authUserError,
+    isLoading: authUserDataIsLoading,
+    mutate: mutateAuthUser,
+  } = useSWR(['user', user?.id], () => user && getUser(user.id));
 
   useEffect(() => {
-    if (!user) return;
+    if (!authUserData) return;
 
-    getUser(user.id).then((res) => {
-      if (!res) return;
-      setFirstName(res.first_name);
-      setLastName(res.last_name);
-      setUsername(res.username);
-      setAvatar(res.avatar);
-      setDataLoaded(true);
-    });
-  }, [user, isOpen]);
+    setAvatar(authUserData.avatar);
+    setUsername(authUserData.username);
+    setFirstName(authUserData.first_name);
+    setLastName(authUserData.last_name);
+  }, [authUserData, isOpen]);
+
+  const uploadRef = useRef<HTMLInputElement>(null);
 
   async function uploadAvatar(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files![0];
@@ -315,101 +406,196 @@ function EditProfileModal({
     }
   }
 
-  return (
-    <Modal
-      backdrop="blur"
-      isOpen={isOpen}
-      onOpenChange={() => setOpen(!isOpen)}
-    >
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">
-              Edit Profile
-            </ModalHeader>
-            <ModalBody>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="col-span-2 mb-2 flex justify-center">
-                  <Skeleton isLoaded={dataLoaded} className="rounded-full">
-                    <Avatar
-                      size="lg"
-                      name={`${firstName.charAt(0)}${lastName.charAt(0)}`}
-                      src={avatar}
-                      isIconOnly
-                      as={Button}
-                      onPress={() => {
-                        uploadRef.current?.click();
-                      }}
+  if (authUserDataIsLoading) {
+    return (
+      <Modal
+        backdrop="blur"
+        isOpen={isOpen}
+        onOpenChange={() => setOpen(!isOpen)}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Edit Profile
+              </ModalHeader>
+              <ModalBody>
+                <div className="flex justify-center items-center">
+                  <Spinner color="default" size="lg" />
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="flat" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    );
+  }
+
+  if (authUserError) {
+    return (
+      <Modal
+        backdrop="blur"
+        isOpen={isOpen}
+        onOpenChange={() => setOpen(!isOpen)}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Edit Profile
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-center">{authUserError.message}</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="flat" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    );
+  }
+
+  if (!authUserData) {
+    return (
+      <Modal
+        backdrop="blur"
+        isOpen={isOpen}
+        onOpenChange={() => setOpen(!isOpen)}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Edit Profile
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-center">User not found.</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="flat" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    );
+  } else {
+    return (
+      <Modal
+        backdrop="blur"
+        isOpen={isOpen}
+        onOpenChange={() => setOpen(!isOpen)}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Edit Profile
+              </ModalHeader>
+              <ModalBody>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="col-span-2 mb-2 flex justify-center">
+                    <Skeleton
+                      isLoaded={!authUserDataIsLoading}
+                      className="rounded-full"
+                    >
+                      <Avatar
+                        size="lg"
+                        name={`${firstName?.charAt(0)}${lastName?.charAt(0)}`}
+                        src={avatar ? avatar : authUserData.avatar}
+                        isIconOnly
+                        as={Button}
+                        onPress={() => {
+                          uploadRef.current?.click();
+                        }}
+                      />
+                      <input
+                        ref={uploadRef}
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={uploadAvatar}
+                      />
+                    </Skeleton>
+                  </div>
+
+                  <Skeleton
+                    isLoaded={!authUserDataIsLoading}
+                    className="rounded-lg"
+                  >
+                    <Input
+                      type="text"
+                      label="First Name"
+                      value={firstName || ''}
+                      onChange={(e) => setFirstName(e.target.value)}
                     />
-                    <input
-                      ref={uploadRef}
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={uploadAvatar}
+                  </Skeleton>
+                  <Skeleton
+                    isLoaded={!authUserDataIsLoading}
+                    className="rounded-lg"
+                  >
+                    <Input
+                      type="text"
+                      label="Last Name"
+                      value={lastName || ''}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </Skeleton>
+
+                  <Skeleton
+                    isLoaded={!authUserDataIsLoading}
+                    className="col-span-2 rounded-lg"
+                  >
+                    <Input
+                      type="text"
+                      label="Username"
+                      value={username || ''}
+                      onChange={(e) => setUsername(e.target.value)}
                     />
                   </Skeleton>
                 </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="flat" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={() => {
+                    updateUser(user!.id, {
+                      username: username!,
+                      first_name: firstName!,
+                      last_name: lastName!,
+                    }).then(() => {
+                      mutateAuthUser({
+                        ...authUserData,
+                        username: username!,
+                        first_name: firstName!,
+                        last_name: lastName!,
+                      });
+                    });
 
-                <Skeleton isLoaded={dataLoaded} className="rounded-lg">
-                  <Input
-                    type="text"
-                    label="First Name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                </Skeleton>
-                <Skeleton isLoaded={dataLoaded} className="rounded-lg">
-                  <Input
-                    type="text"
-                    label="Last Name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </Skeleton>
-
-                <Skeleton
-                  isLoaded={dataLoaded}
-                  className="col-span-2 rounded-lg"
+                    onClose();
+                  }}
                 >
-                  <Input
-                    type="text"
-                    label="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </Skeleton>
-              </div>
-            </ModalBody>
-            <ModalFooter>
-              <Button color="danger" variant="flat" onPress={onClose}>
-                Cancel
-              </Button>
-              <Button
-                color="primary"
-                onPress={() => {
-                  updateUser(user!.id, {
-                    username,
-                    first_name: firstName,
-                    last_name: lastName,
-                  }).then(() => {
-                    // Refresh the session to update the user object
-                    // Note: This doesn't feel like the best way to do this
-                    auth.refreshSession();
-                  });
-
-                  onClose();
-                }}
-              >
-                Save
-              </Button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
-    </Modal>
-  );
-}
-function getFollowers(userId: string) {
-  throw new Error('Function not implemented.');
+                  Save
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    );
+  }
 }

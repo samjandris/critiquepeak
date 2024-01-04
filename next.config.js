@@ -1,17 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    dangerouslyAllowSVG: true,
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.supabase.co',
-        port: '',
+        hostname: '*.supabase.co',
         pathname: '/storage/v1/object/public/**',
       },
       {
         protocol: 'https',
         hostname: 'image.tmdb.org',
-        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'source.boringavatars.com',
         pathname: '**',
       },
     ],

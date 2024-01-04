@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import useSWR from 'swr';
 import {
   Navbar,
   NavbarBrand,
@@ -43,20 +43,10 @@ export default function Navigation() {
   const { user, authLoaded, signOut } = useAuth();
   const pathname = usePathname();
 
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
-
-  useEffect(() => {
-    if (!user) return;
-
-    getUser(user.id).then((res) => {
-      if (!res) return;
-      setName(`${res.first_name} ${res.last_name}`);
-      setUsername(res.username);
-      setAvatarUrl(res.avatar);
-    });
-  }, [user]);
+  const { data: userData, isLoading: userDataIsLoading } = useSWR(
+    ['user', user?.id],
+    () => user && getUser(user.id)
+  );
 
   return (
     <Navbar isBordered>
@@ -78,10 +68,10 @@ export default function Navigation() {
       </NavbarContent>
       <NavbarContent
         justify="end"
-        data-authloaded={authLoaded}
+        data-authloaded={!userDataIsLoading}
         className="pointer-events-none opacity-0 data-[authloaded=true]:pointer-events-auto data-[authloaded=true]:opacity-100 transition-all"
       >
-        {user ? (
+        {userData ? (
           <NavbarContent as="div" justify="end">
             <Dropdown placement="bottom-end">
               <DropdownTrigger>
@@ -89,19 +79,18 @@ export default function Navigation() {
                   isBordered
                   as="button"
                   size="sm"
-                  src={avatarUrl}
-                  color="success"
+                  src={userData.avatar}
                   className="transition-transform"
                 />
               </DropdownTrigger>
               <DropdownMenu variant="flat">
                 <DropdownItem isReadOnly className="pointer-events-none">
-                  <p className="font-semibold leading-tight">{name}</p>
+                  <p className="font-semibold leading-tight">{`${userData.first_name} ${userData.last_name}`}</p>
                   <p className="font-semibold leading-tight">
-                    {`@${username}`}
+                    {`@${userData.username}`}
                   </p>
                 </DropdownItem>
-                <DropdownItem href={'/profile/' + username}>
+                <DropdownItem href={'/profile/' + userData.username}>
                   Profile
                 </DropdownItem>
                 <DropdownItem

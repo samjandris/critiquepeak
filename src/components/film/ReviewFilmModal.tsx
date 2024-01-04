@@ -71,8 +71,8 @@ export default function ReviewFilmModal({
         <ModalHeader>Review a film</ModalHeader>
         <ModalBody>
           <div className="flex flex-col gap-4">
-            <div className="flex gap-4">
-              <div ref={posterRef} className="h-[180px] aspect-[1/1.5]">
+            <div className="grid grid-cols-[1fr,2fr] gap-4">
+              <div ref={posterRef} className="aspect-[1/1.5]">
                 {selectedMovie ? (
                   <Image
                     src={selectedMovie?.poster}
@@ -88,12 +88,12 @@ export default function ReviewFilmModal({
                 style={{
                   height: posterHeight || 0,
                 }}
-                className="flex flex-col w-full gap-1"
+                className="flex flex-col gap-4"
               >
                 {selectedMovie ? (
                   <p className="text-md font-bold">{selectedMovie?.title}</p>
                 ) : (
-                  <Skeleton className="w-[200px] h-1/6 rounded-xl" />
+                  <Skeleton className="h-1/3 rounded-xl" />
                 )}
                 {selectedMovie ? (
                   <ScrollShadow>
@@ -102,7 +102,7 @@ export default function ReviewFilmModal({
                     </p>
                   </ScrollShadow>
                 ) : (
-                  <Skeleton className="w-[200px] h-1/2 rounded-xl" />
+                  <Skeleton className="h-full rounded-xl" />
                 )}
               </div>
             </div>

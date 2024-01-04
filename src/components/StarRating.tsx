@@ -6,20 +6,30 @@ import {
 } from '@/components/Icons';
 import { twMerge } from 'tailwind-merge';
 
-export function StarRating({ rating }: { rating: number }) {
+export function StarRating({
+  rating,
+  className,
+}: {
+  rating: number;
+  className?: string;
+}) {
   const stars = [];
 
   for (let i = 1; i <= 5; i++) {
     if (rating >= i) {
-      stars.push(<StarFillIcon key={i} />);
+      stars.push(<StarFillIcon key={i} className="w-full h-auto" />);
     } else if (rating > i - 1 && rating < i) {
-      stars.push(<StarHalfIcon key={i} />);
+      stars.push(<StarHalfIcon key={i} className="w-full h-auto" />);
     } else {
-      stars.push(<StarOutlineIcon key={i} />);
+      stars.push(<StarOutlineIcon key={i} className="w-full h-auto" />);
     }
   }
 
-  return <div className="flex gap-0.5">{stars.map((star) => star)}</div>;
+  return (
+    <div className={twMerge('flex gap-0.5', className)}>
+      {stars.map((star) => star)}
+    </div>
+  );
 }
 
 export function StarRatingPrecise({

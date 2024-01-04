@@ -31,6 +31,7 @@ import {
   updateUser,
   getFollowerIds,
 } from '@/lib/users';
+import { truncateNumber } from '@/lib/misc';
 
 const supabase = getClient();
 
@@ -141,14 +142,14 @@ export default function ProfilePage({
                 size="sm"
                 onPress={() => setFollowersModalOpen(!followersModalOpen)}
               >
-                {userData.followers + ' Followers'}
+                {truncateNumber(userData.followers) + ' Followers'}
               </Button>
               <Button
                 variant="light"
                 size="sm"
                 onPress={() => setFollowingModalOpen(!followingModalOpen)}
               >
-                {userData.following.length + ' Following'}
+                {truncateNumber(userData.following.length) + ' Following'}
               </Button>
             </div>
           </Skeleton>

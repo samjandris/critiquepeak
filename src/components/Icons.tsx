@@ -14,6 +14,81 @@ export function CritiquePeakLogo(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
+export function PlusIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 1024 1024"
+      fill="currentColor"
+      height={iconSize}
+      width={iconSize}
+      {...props}
+    >
+      <defs>
+        <style />
+      </defs>
+      <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
+      <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
+    </svg>
+  );
+}
+
+export function FilmIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      height={iconSize}
+      width={iconSize}
+      {...props}
+    >
+      <path d="M4.18 2 H19.82 A2.18 2.18 0 0 1 22 4.18 V19.82 A2.18 2.18 0 0 1 19.82 22 H4.18 A2.18 2.18 0 0 1 2 19.82 V4.18 A2.18 2.18 0 0 1 4.18 2 z" />
+      <path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5" />
+    </svg>
+  );
+}
+
+export function TVIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      height={iconSize}
+      width={iconSize}
+      {...props}
+    >
+      <path d="M4 7 H20 A2 2 0 0 1 22 9 V20 A2 2 0 0 1 20 22 H4 A2 2 0 0 1 2 20 V9 A2 2 0 0 1 4 7 z" />
+      <path d="M17 2l-5 5-5-5" />
+    </svg>
+  );
+}
+
+export function MusicNoteIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      fill="none"
+      viewBox="0 0 24 24"
+      height={iconSize}
+      width={iconSize}
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M12 8.954l5.635-1.127a2.942 2.942 0 00-1.154-5.769l-4.07.814A3 3 0 0010 5.814v8.076a4 4 0 102 3.465v-8.4zm4.874-4.935l-4.07.814a1 1 0 00-.804.98v1.102l5.243-1.049a.942.942 0 00-.37-1.847zM10 17.354a2 2 0 10-4 0 2 2 0 004 0z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
 export function DropdownMenuIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg

@@ -40,13 +40,24 @@ export default function SignUpPage({
             </CardHeader>
 
             <CardBody className="grid grid-cols-2 gap-3 w-[350px]">
-              <Input name="firstName" type="name" placeholder="First Name" />
-              <Input name="lastName" type="name" placeholder="Last Name" />
+              <Input
+                name="firstName"
+                type="name"
+                placeholder="First Name"
+                size="lg"
+              />
+              <Input
+                name="lastName"
+                type="name"
+                placeholder="Last Name"
+                size="lg"
+              />
               <Input
                 name="username"
-                type="username"
+                type="text"
                 placeholder="Username"
                 className="col-span-2"
+                size="lg"
               />
 
               <Input
@@ -55,6 +66,7 @@ export default function SignUpPage({
                 placeholder="Email"
                 startContent={<EmailIcon />}
                 className="col-span-2"
+                size="lg"
               />
               <Input
                 name="password"
@@ -62,6 +74,7 @@ export default function SignUpPage({
                 placeholder="Password"
                 startContent={<PasswordIcon />}
                 className="col-span-2"
+                size="lg"
               />
 
               {searchParams?.message && (

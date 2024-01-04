@@ -45,12 +45,14 @@ export default function LoginPage({
                 type="email"
                 placeholder="Email"
                 startContent={<EmailIcon />}
+                size="lg"
               />
               <Input
                 name="password"
                 type="password"
                 placeholder="Password"
                 startContent={<PasswordIcon />}
+                size="lg"
               />
 
               {searchParams?.message && (

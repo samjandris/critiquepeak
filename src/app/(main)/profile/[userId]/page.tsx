@@ -538,6 +538,7 @@ function EditProfileModal({
                     <Input
                       type="text"
                       label="First Name"
+                      size="lg"
                       value={firstName || ''}
                       onChange={(e) => setFirstName(e.target.value)}
                     />
@@ -549,6 +550,7 @@ function EditProfileModal({
                     <Input
                       type="text"
                       label="Last Name"
+                      size="lg"
                       value={lastName || ''}
                       onChange={(e) => setLastName(e.target.value)}
                     />
@@ -561,6 +563,7 @@ function EditProfileModal({
                     <Input
                       type="text"
                       label="Username"
+                      size="lg"
                       value={username || ''}
                       onChange={(e) => setUsername(e.target.value)}
                     />

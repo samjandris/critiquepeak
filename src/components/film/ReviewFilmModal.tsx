@@ -38,6 +38,7 @@ export default function ReviewFilmModal({
   const [filmRating, setFilmRating] = useState(0);
   const [isReviewWritten, setIsReviewWritten] = useState(false);
   const [reviewText, setReviewText] = useState('');
+  const [isRewatch, setIsRewatch] = useState(false);
   const { data: searchResults, isLoading: searchResultsIsLoading } = useSWR(
     ['search', 'film', debouncedSearchTerm],
     () => {
@@ -54,6 +55,7 @@ export default function ReviewFilmModal({
     setFilmRating(0);
     setIsReviewWritten(false);
     setReviewText('');
+    setIsRewatch(false);
     onOpenChange();
   }
 
@@ -110,7 +112,9 @@ export default function ReviewFilmModal({
             */}
             {reviewStep === 1 && (
               <Autocomplete
+                size="lg"
                 label="Search for a film"
+                menuTrigger="input"
                 onInputChange={(filmTitle) => {
                   if (
                     filmTitle.toLowerCase() !== searchTerm.toLowerCase() &&
@@ -154,12 +158,20 @@ export default function ReviewFilmModal({
             {reviewStep == 2 && (
               <div className="flex flex-col gap-4">
                 <div className="flex justify-between">
-                  <Checkbox
-                    isSelected={isReviewWritten}
-                    onValueChange={setIsReviewWritten}
-                  >
-                    Written review?
-                  </Checkbox>
+                  <div className="flex flex-col gap-2">
+                    <Checkbox
+                      isSelected={isReviewWritten}
+                      onValueChange={setIsReviewWritten}
+                    >
+                      Written review?
+                    </Checkbox>
+                    <Checkbox
+                      isSelected={isRewatch}
+                      onValueChange={setIsRewatch}
+                    >
+                      Rewatch?
+                    </Checkbox>
+                  </div>
                   <StarRating rating={filmRating} className="w-[150px]" />
                 </div>
                 {isReviewWritten && (

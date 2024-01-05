@@ -63,27 +63,11 @@ export async function getUser(id: string): Promise<User> {
       user.avatar = 'https://source.boringavatars.com/beam/' + user.id;
     }
 
-    user.followers = await getFollowerCount(id);
+    user.followingCount = await getFollowingCount(id);
+    user.followerCount = await getFollowerCount(id);
   } catch (error) {}
 
   return user;
-}
-
-export async function isUserFollowing(userId: string, toCheck: string) {
-  const supabase = getServer(cookies());
-
-  const { data, error } = await supabase
-    .from('users')
-    .select('following')
-    .eq('id', userId)
-    .limit(1);
-
-  if (error) {
-    console.error(error);
-    throw error;
-  }
-
-  return data[0].following.includes(toCheck);
 }
 
 export async function updateUser(
@@ -106,39 +90,26 @@ export async function updateUser(
   return;
 }
 
-export async function getFollowerCount(id: string) {
-  const supabase = getServer(cookies());
-
-  const { count, error } = await supabase
-    .from('users')
-    .select('id', { count: 'exact' })
-    .filter('following', 'cs', `{${id}}`);
-
-  if (error) {
-    console.error(error);
-    throw error;
-  }
-
-  return count;
-}
-
 export async function followUser(userId: string, toFollow: string) {
   const supabase = getServer(cookies());
 
-  let user = await getUser(userId);
-  let following: string[] = user.following;
+  let { data: checkFollowsData } = await supabase
+    .from('follows')
+    .select('*')
+    .eq('follower_id', userId)
+    .eq('following_id', toFollow);
 
-  if (following.includes(toFollow)) return;
-  following.push(toFollow);
+  if (checkFollowsData?.length === 0) {
+    const { error: insertFollowError } = await supabase.from('follows').insert({
+      follower_id: userId,
+      following_id: toFollow,
+      timestamp: new Date().toISOString(),
+    });
 
-  const { error } = await supabase
-    .from('users')
-    .update({ following })
-    .eq('id', userId);
-
-  if (error) {
-    console.error(error);
-    throw error;
+    if (insertFollowError) {
+      console.error('Failed to follow user:', insertFollowError);
+      throw insertFollowError;
+    }
   }
 
   return;
@@ -147,38 +118,128 @@ export async function followUser(userId: string, toFollow: string) {
 export async function unfollowUser(userId: string, toUnfollow: string) {
   const supabase = getServer(cookies());
 
-  let user = await getUser(userId);
-  let following: string[] = user.following;
+  const { error: deleteFollowError } = await supabase
+    .from('follows')
+    .delete()
+    .eq('follower_id', userId)
+    .eq('following_id', toUnfollow);
 
-  if (!following.includes(toUnfollow)) return;
-  following = following.filter((id) => id !== toUnfollow);
-
-  const { error } = await supabase
-    .from('users')
-    .update({ following })
-    .eq('id', userId);
-
-  if (error) {
-    console.error(error);
-    throw error;
+  if (deleteFollowError) {
+    console.error('Failed to unfollow user:', deleteFollowError);
+    throw deleteFollowError;
   }
 
   return;
 }
 
-export async function getFollowerIds(id: string) {
+export async function isUserFollowing(userId: string, toCheck: string) {
   const supabase = getServer(cookies());
 
   const { data, error } = await supabase
-    .from('users')
+    .from('follows')
     .select('id')
-    .filter('following', 'cs', `{${id}}`);
+    .eq('follower_id', userId)
+    .eq('following_id', toCheck)
+    .maybeSingle();
 
   if (error) {
-    console.error(error);
+    console.error('Error checking following status', error);
     throw error;
   }
 
-  const ids = data.map((user) => user.id);
-  return ids;
+  return data !== null;
+}
+
+export async function getFollowing(userId: string) {
+  const supabase = getServer(cookies());
+
+  const { data, error } = await supabase
+    .from('follows')
+    .select('following_id:follows_following_id_fkey(*)')
+    .eq('follower_id', userId);
+
+  if (error) {
+    console.error('Error getting list of following', error);
+    throw error;
+  }
+
+  return data.map((follow) => follow.following_id);
+}
+
+export async function getFollowingIds(userId: string) {
+  const supabase = getServer(cookies());
+
+  const { data, error } = await supabase
+    .from('follows')
+    .select('following_id')
+    .eq('follower_id', userId);
+
+  if (error) {
+    console.error('Error getting following IDs', error);
+    throw error;
+  }
+
+  return data.map((follow) => follow.following_id);
+}
+
+export async function getFollowingCount(userId: string) {
+  const supabase = getServer(cookies());
+
+  const { count, error } = await supabase
+    .from('follows')
+    .select('following_id', { count: 'exact' })
+    .eq('follower_id', userId);
+
+  if (error) {
+    console.error('Error getting follower count', error);
+  }
+
+  return count;
+}
+
+export async function getFollowers(userId: string) {
+  const supabase = getServer(cookies());
+
+  const { data, error } = await supabase
+    .from('follows')
+    .select('follower_id:follows_follower_id_fkey(*)')
+    .eq('following_id', userId);
+
+  if (error) {
+    console.error('Error getting list of followers', error);
+    throw error;
+  }
+
+  return data.map((follow) => follow.follower_id);
+}
+
+export async function getFollowerIds(userId: string) {
+  const supabase = getServer(cookies());
+
+  const { data, error } = await supabase
+    .from('follows')
+    .select('follower_id')
+    .eq('following_id', userId);
+
+  if (error) {
+    console.error('Error getting follower IDs', error);
+    throw error;
+  }
+
+  return data.map((follow) => follow.follower_id);
+}
+
+export async function getFollowerCount(userId: string) {
+  const supabase = getServer(cookies());
+
+  const { count, error } = await supabase
+    .from('follows')
+    .select('follower_id', { count: 'exact' })
+    .eq('following_id', userId);
+
+  if (error) {
+    console.error('Error getting follower count', error);
+  }
+
+  return count;
 }

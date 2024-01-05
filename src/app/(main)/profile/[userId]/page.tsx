@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import { useState, useEffect, ChangeEvent, useRef } from 'react';
+import { useState, useEffect, useRef, ChangeEvent } from 'react';
 import useSWR from 'swr';
 import {
   Spinner,
@@ -26,10 +26,12 @@ import { getClient } from '@/lib/supabase';
 import {
   getUserIdByUsername,
   getUser,
+  isUserFollowing,
   followUser,
   unfollowUser,
-  updateUser,
+  getFollowingIds,
   getFollowerIds,
+  updateUser,
 } from '@/lib/users';
 import { truncateNumber } from '@/lib/misc';
 
@@ -47,14 +49,17 @@ export default function ProfilePage({
   const [followersModalOpen, setFollowersModalOpen] = useState(false);
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
 
-  const { data: userId, isLoading: userIdIsLoading } = useSWR(
-    username ? ['user', username] : null,
-    () => getUserIdByUsername(username)
+  const {
+    data: userId,
+    error: userIdError,
+    isLoading: userIdIsLoading,
+  } = useSWR(username ? ['user', username] : null, () =>
+    getUserIdByUsername(username)
   );
 
   const {
     data: userData,
-    error: userError,
+    error: userDataError,
     isLoading: userDataIsLoading,
     mutate: mutateUser,
   } = useSWR(userId && ['user', userId], () => {
@@ -66,10 +71,34 @@ export default function ProfilePage({
     data: authUserData,
     error: authUserError,
     isLoading: authUserDataIsLoading,
-    mutate: mutateAuthUser,
   } = useSWR(['user', user?.id], () => user && getUser(user.id));
 
-  if (userIdIsLoading || userDataIsLoading || authUserDataIsLoading) {
+  const {
+    data: isUserFollowingAuth,
+    error: userFollowingAuthError,
+    isLoading: userFollowingAuthIsLoading,
+  } = useSWR(['isFollowing', userId, user?.id], () => {
+    if (!userId || !user) return;
+    return isUserFollowing(userId, user.id);
+  });
+
+  const {
+    data: isAuthFollowingUser,
+    error: authFollowingUserError,
+    isLoading: authFollowingUserIsLoading,
+    mutate: mutateAuthFollowingUser,
+  } = useSWR(['isFollowing', user?.id, userId], () => {
+    if (!user || !userId) return;
+    return isUserFollowing(user.id, userId);
+  });
+
+  if (
+    userIdIsLoading ||
+    userDataIsLoading ||
+    authUserDataIsLoading ||
+    userFollowingAuthIsLoading ||
+    authFollowingUserIsLoading
+  ) {
     return (
       <div className="flex justify-center items-center h-[90vh]">
         <Spinner color="default" size="lg" />
@@ -77,13 +106,22 @@ export default function ProfilePage({
     );
   }
 
-  if (userError || authUserError) {
+  if (
+    userIdError ||
+    userDataError ||
+    authUserError ||
+    userFollowingAuthError ||
+    authFollowingUserError
+  ) {
     return (
       <div className="flex justify-center items-center h-[90vh]">
         <Card>
           <CardBody>
-            <p>{userError?.message}</p>
+            <p>{userIdError?.message}</p>
+            <p>{userDataError?.message}</p>
             <p>{authUserError?.message}</p>
+            <p>{userFollowingAuthError?.message}</p>
+            <p>{authFollowingUserError?.message}</p>
           </CardBody>
         </Card>
       </div>
@@ -125,12 +163,11 @@ export default function ProfilePage({
                 <p className="text-gray-500 leading-tight">
                   @{userData.username}
                 </p>
-                {authUserData &&
-                  userData.following.includes(authUserData.id) && (
-                    <Chip size="sm" variant="flat">
-                      Follows You
-                    </Chip>
-                  )}
+                {isUserFollowingAuth && (
+                  <Chip size="sm" variant="flat">
+                    Follows You
+                  </Chip>
+                )}
               </div>
             </div>
           </Skeleton>
@@ -142,14 +179,14 @@ export default function ProfilePage({
                 size="sm"
                 onPress={() => setFollowersModalOpen(!followersModalOpen)}
               >
-                {truncateNumber(userData.followers) + ' Followers'}
+                {truncateNumber(userData.followerCount) + ' Followers'}
               </Button>
               <Button
                 variant="light"
                 size="sm"
                 onPress={() => setFollowingModalOpen(!followingModalOpen)}
               >
-                {truncateNumber(userData.following.length) + ' Following'}
+                {truncateNumber(userData.followingCount) + ' Following'}
               </Button>
             </div>
           </Skeleton>
@@ -171,36 +208,28 @@ export default function ProfilePage({
                   size="sm"
                   onPress={() => {
                     if (authUserData) {
-                      if (authUserData.following.includes(userData.id)) {
+                      if (isAuthFollowingUser) {
                         unfollowUser(authUserData.id, userData.id);
-                        mutateAuthUser({
-                          ...authUserData,
-                          following: authUserData.following.filter(
-                            (id) => id !== userData.id
-                          ),
-                        });
+
+                        mutateAuthFollowingUser(false); // update follow state client side
                         mutateUser({
                           ...userData,
-                          followers: userData.followers - 1,
+                          followerCount: userData.followerCount - 1, // update follower count client side
                         });
                       } else {
                         followUser(authUserData.id, userData.id);
-                        mutateAuthUser({
-                          ...authUserData,
-                          following: [...authUserData.following, userData.id],
-                        });
+
+                        mutateAuthFollowingUser(true); // update follow state client side
                         mutateUser({
                           ...userData,
-                          followers: userData.followers + 1,
+                          followerCount: userData.followerCount + 1, // update follower count client side
                         });
                       }
                     }
                   }}
                   className="w-full"
                 >
-                  {authUserData && authUserData.following.includes(userData.id)
-                    ? 'Unfollow'
-                    : 'Follow'}
+                  {isAuthFollowingUser ? 'Unfollow' : 'Follow'}
                 </Button>
               )
             )}
@@ -244,11 +273,9 @@ function UserListModal({
     data: userList,
     error: userListError,
     isLoading: userListIsLoading,
-  } = useSWR([type, userId], () => {
+  } = useSWR([type + 'Ids', userId], () => {
     if (type === 'following') {
-      return getUser(userId).then((res) => {
-        return res.following;
-      });
+      return getFollowingIds(userId);
     } else {
       return getFollowerIds(userId);
     }
@@ -344,6 +371,22 @@ function UserListModal({
                   {userList?.map((userId) => (
                     <UserChip key={userId} userId={userId} />
                   ))}
+
+                  {/*
+                  TODO: This should be more performant
+                  {userList &&
+                    userList.map((user) => (
+                      <UserChip
+                        key={user.id}
+                        user={user}
+                        isUser={false}
+                        isFollowing={false}
+                        onFollowChange={() => {
+                          console.log('follow change');
+                        }}
+                      />
+                    ))}
+                  */}
                 </ModalBody>
                 <ModalFooter>
                   <Button color="danger" variant="light" onPress={onClose}>

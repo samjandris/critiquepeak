@@ -4,7 +4,13 @@ import Link from 'next/link';
 import useSWR from 'swr';
 import { Avatar, Button, Skeleton } from '@nextui-org/react';
 import { useAuth } from '@/components/AuthProvider';
-import { getUser, followUser, unfollowUser } from '@/lib/users';
+import {
+  getUser,
+  isUserFollowing,
+  followUser,
+  unfollowUser,
+} from '@/lib/users';
+import { UserDB } from '@/lib/types';
 
 export default function UserChip({ userId }: { userId: string }) {
   const { user: authUser } = useAuth();
@@ -14,11 +20,19 @@ export default function UserChip({ userId }: { userId: string }) {
     () => getUser(userId)
   );
 
+  const { data: authUserData, isLoading: authUserDataIsLoading } = useSWR(
+    ['user', authUser?.id],
+    () => authUser && getUser(authUser.id)
+  );
+
   const {
-    data: authUserData,
-    isLoading: authUserDataIsLoading,
-    mutate: mutateAuthUser,
-  } = useSWR(['user', authUser?.id], () => authUser && getUser(authUser.id));
+    data: isAuthFollowingUser,
+    isLoading: authFollowingUserIsLoading,
+    mutate: mutateAuthFollowingUser,
+  } = useSWR(['isFollowing', authUser?.id, userId], () => {
+    if (!authUser) return;
+    return isUserFollowing(authUser.id, userId);
+  });
 
   return (
     <div className="flex justify-between items-center">
@@ -45,12 +59,20 @@ export default function UserChip({ userId }: { userId: string }) {
       </Link>
       {authUser && (
         <Button
-          isLoading={userDataIsLoading || authUserDataIsLoading}
+          isLoading={
+            userDataIsLoading ||
+            authUserDataIsLoading ||
+            authFollowingUserIsLoading
+          }
           isDisabled={
-            (userData && authUser && userData.id === authUser!.id) || false
+            (!authFollowingUserIsLoading &&
+              userData &&
+              authUser &&
+              userData.id === authUser!.id) ||
+            false
           }
           className={
-            authUserData?.following.includes(userData?.id || '')
+            isAuthFollowingUser
               ? 'bg-transparent text-foreground border-default-200'
               : ''
           }
@@ -58,42 +80,85 @@ export default function UserChip({ userId }: { userId: string }) {
           radius="full"
           size="sm"
           variant={
-            !userDataIsLoading && !authUserDataIsLoading
+            !userDataIsLoading &&
+            !authUserDataIsLoading &&
+            !authFollowingUserIsLoading
               ? userData && authUser && userData.id === authUser!.id
                 ? 'flat'
-                : authUserData?.following.includes(userData?.id || '')
+                : isAuthFollowingUser
                 ? 'bordered'
                 : 'solid'
               : 'flat'
           }
           onPress={() => {
             if (!userData || !authUserData) return;
-            if (authUserData.following.includes(userData?.id || '')) {
+            if (isAuthFollowingUser) {
               unfollowUser(authUserData.id, userData.id);
-              mutateAuthUser({
-                ...authUserData,
-                following: authUserData.following.filter(
-                  (id) => id !== userData.id
-                ),
-              });
+
+              mutateAuthFollowingUser(false);
             } else {
               followUser(authUserData.id, userData.id);
-              mutateAuthUser({
-                ...authUserData,
-                following: [...authUserData.following, userData.id],
-              });
+
+              mutateAuthFollowingUser(true);
             }
           }}
         >
-          {!userDataIsLoading && !authUserDataIsLoading
+          {!userDataIsLoading &&
+          !authUserDataIsLoading &&
+          !authFollowingUserIsLoading
             ? userData && authUser && userData.id === authUser!.id
               ? 'You'
-              : authUserData?.following.includes(userData?.id || '')
+              : isAuthFollowingUser
               ? 'Unfollow'
               : 'Follow'
             : ''}
         </Button>
       )}
+    </div>
+  );
+}
+
+export function UserChipDumb({
+  user,
+  isUser,
+  isFollowing,
+  onFollowChange,
+}: {
+  user: UserDB;
+  isUser: boolean;
+  isFollowing: boolean;
+  onFollowChange: () => void;
+}) {
+  return (
+    <div className="flex justify-between items-center">
+      <Link href={'/profile/' + user.username} className="flex gap-2.5 w-full">
+        <Avatar
+          isBordered
+          radius="full"
+          size="md"
+          // src={user.avatar}
+        />
+        <div className="flex flex-col gap-0 items-start justify-center">
+          <h4 className="text-small font-semibold leading-none text-default-600">
+            {user.first_name} {user.last_name}
+          </h4>
+          <h5 className="text-small tracking-tight text-default-400">
+            @{user.username}
+          </h5>
+        </div>
+      </Link>
+      <Button
+        className={
+          isFollowing ? 'bg-transparent text-foreground border-default-200' : ''
+        }
+        color="primary"
+        radius="full"
+        size="sm"
+        variant={isFollowing ? 'bordered' : 'solid'}
+        onPress={onFollowChange}
+      >
+        {isUser ? 'You' : isFollowing ? 'Unfollow' : 'Follow'}
+      </Button>
     </div>
   );
 }

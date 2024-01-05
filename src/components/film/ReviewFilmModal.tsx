@@ -34,7 +34,7 @@ export default function ReviewFilmModal({
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMovie, setSelectedMovie] = useState<Film | null>(null);
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [filmRating, setFilmRating] = useState(0);
   const [isReviewWritten, setIsReviewWritten] = useState(false);
   const [reviewText, setReviewText] = useState('');
@@ -88,10 +88,14 @@ export default function ReviewFilmModal({
                 style={{
                   height: posterHeight || 0,
                 }}
-                className="flex flex-col gap-4"
+                className={
+                  'flex flex-col ' + (selectedMovie ? 'gap-1' : 'gap-4')
+                }
               >
                 {selectedMovie ? (
-                  <p className="text-md font-bold">{selectedMovie?.title}</p>
+                  <p className="text-medium font-bold leading-5">
+                    {selectedMovie?.title}
+                  </p>
                 ) : (
                   <Skeleton className="h-1/3 rounded-xl" />
                 )}
@@ -176,8 +180,10 @@ export default function ReviewFilmModal({
                 </div>
                 {isReviewWritten && (
                   <Textarea
+                    size="lg"
                     label="Your review"
                     placeholder="Write your review here"
+                    value={reviewText}
                     onValueChange={setReviewText}
                   />
                 )}

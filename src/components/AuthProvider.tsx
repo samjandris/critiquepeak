@@ -74,7 +74,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         first_name: firstName,
         last_name: lastName,
         created_at: user.created_at,
-        following: [],
       });
     } else {
       console.error('User was NOT created properly');

@@ -98,13 +98,13 @@ export default function UserReview({
       <CardFooter className="gap-3">
         <div className="flex gap-1">
           <p className="font-semibold text-default-400 text-small">
-            {truncateNumber(review.reviewedBy.following.length)}
+            {truncateNumber(review.reviewedBy.followingCount)}
           </p>
           <p className=" text-default-400 text-small">Following</p>
         </div>
         <div className="flex gap-1">
           <p className="font-semibold text-default-400 text-small">
-            {truncateNumber(review.reviewedBy.followers!)}
+            {truncateNumber(review.reviewedBy.followerCount)}
           </p>
           <p className="text-default-400 text-small">Followers</p>
         </div>

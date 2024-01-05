@@ -4,12 +4,12 @@ export interface UserDB {
   first_name: string;
   last_name: string;
   created_at: string;
-  following: string[];
 }
 
 export interface User extends UserDB {
   avatar: string;
-  followers: number;
+  followingCount: number;
+  followerCount: number;
 }
 
 export interface Film {

@@ -7,7 +7,7 @@ import { faker } from '@faker-js/faker';
 
 export default async function FilmPage() {
   const films = await getTrendingMovies('week', {
-    posterSize: 'w342',
+    // posterSize: 'w342',
   });
 
   return (

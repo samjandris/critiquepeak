@@ -29,9 +29,9 @@ export default function FilmPoster({
           alt={'Film poster for ' + film.title + '.'}
           width={0}
           height={0}
-          sizes="100vw"
+          sizes="33vw"
           isBlurred
-          className="w-full h-auto"
+          className="w-full"
         />
         {/* <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
           <p className="text-tiny text-center text-white/80">{film.title}</p>

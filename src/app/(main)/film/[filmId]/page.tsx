@@ -12,8 +12,8 @@ export default async function FilmDetails({
   params: { filmId: string };
 }) {
   const filmDetails = await getMovie(params.filmId, {
-    posterSize: 'w500',
-    backdropSize: 'w1280',
+    // posterSize: 'w500',
+    // backdropSize: 'w1280',
   });
 
   return (
@@ -24,10 +24,10 @@ export default async function FilmDetails({
         alt={'Poster for the film ' + filmDetails.title}
         width={0}
         height={0}
-        sizes="100vw"
+        sizes="25vw"
         shadow="md"
         isBlurred
-        className="w-full h-auto"
+        className="w-full"
       />
 
       <div className="col-span-2 flex flex-col gap-2 justify-center">

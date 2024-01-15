@@ -6,6 +6,11 @@ const movieDbHeaders = {
   Authorization: 'Bearer ' + process.env.TMDB_ACCESS_TOKEN,
 };
 
+const defaults = {
+  posterSize: 'w780',
+  backdropSize: 'w1280',
+};
+
 let config = {
   images: {
     base_url: 'http://image.tmdb.org/t/p/',
@@ -86,7 +91,10 @@ async function getConfig() {
 
 export async function getTrendingMovies(
   timeWindow: string,
-  { posterSize = 'original', backdropSize = 'original' } = {}
+  {
+    posterSize = defaults.posterSize,
+    backdropSize = defaults.backdropSize,
+  } = {}
 ) {
   const response = await fetch(
     `https://api.themoviedb.org/3/trending/movie/${timeWindow}?api_key=${movieDbApiKey}`
@@ -110,7 +118,10 @@ export async function getTrendingMovies(
 
 export async function getMovie(
   movieId: string,
-  { posterSize = 'original', backdropSize = 'original' } = {}
+  {
+    posterSize = defaults.posterSize,
+    backdropSize = defaults.backdropSize,
+  } = {}
 ) {
   const response = await fetch(
     `https://api.themoviedb.org/3/movie/${movieId}?api_key=${movieDbApiKey}`
@@ -134,7 +145,10 @@ export async function getMovie(
 
 export async function searchMovies(
   searchTerm: string,
-  { posterSize = 'original', backdropSize = 'original' } = {}
+  {
+    posterSize = defaults.posterSize,
+    backdropSize = defaults.backdropSize,
+  } = {}
 ) {
   const response = await fetch(
     `https://api.themoviedb.org/3/search/movie?api_key=${movieDbApiKey}&query=${searchTerm}`

@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    dangerouslyAllowSVG: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -12,6 +11,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'image.tmdb.org',
         pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+        pathname: '/api/**',
       },
       {
         protocol: 'https',

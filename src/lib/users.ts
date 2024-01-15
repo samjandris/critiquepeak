@@ -60,7 +60,10 @@ export async function getUser(id: string): Promise<User> {
     });
 
     if (!response.ok) {
-      user.avatar = 'https://source.boringavatars.com/beam/' + user.id;
+      user.avatar =
+        'https://ui-avatars.com/api/?size=512&name=' +
+        encodeURIComponent(`${user.first_name} ${user.last_name}`); // UI Avatars
+      // user.avatar = 'https://source.boringavatars.com/beam/' + encodeURIComponent(user.id); // Boring Avatars
     }
 
     user.followingCount = await getFollowingCount(id);

@@ -8,8 +8,8 @@ export interface UserDB {
 
 export interface User extends UserDB {
   avatar: string;
-  followingCount: number;
-  followerCount: number;
+  following_count: number;
+  follower_count: number;
 }
 
 export interface Film {
@@ -27,14 +27,14 @@ export interface Film {
 
 export interface Review {
   id: string;
-  reviewedBy: User;
+  user_id: string;
   review: string;
   rating: number;
-  createdAt?: string;
+  created_at: string;
 }
 
 export interface FilmReview extends Review {
-  film: Film;
+  movie_id: string;
 }
 
 export interface SeriesReview extends Review {

@@ -35,7 +35,7 @@ export default function UserChip({ userId }: { userId: string }) {
   });
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="w-full flex justify-between items-center gap-5">
       <Link
         href={'/profile/' + userData?.username}
         className="flex gap-2.5 w-full"
@@ -51,9 +51,9 @@ export default function UserChip({ userId }: { userId: string }) {
             </h5>
           </div>
         ) : (
-          <div className="flex flex-col gap-1 items-start justify-center">
-            <Skeleton className="rounded-lg w-[100px] h-[15px]" />
-            <Skeleton className="rounded-lg w-[100px] h-[15px]" />
+          <div className="flex flex-col flex-grow gap-1 items-start justify-center">
+            <Skeleton className="rounded-lg w-1/2 h-[15px]" />
+            <Skeleton className="rounded-lg w-1/4 h-[15px]" />
           </div>
         )}
       </Link>

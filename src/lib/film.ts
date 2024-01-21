@@ -82,7 +82,12 @@ async function getConfig() {
   if (config) return config;
 
   const response = await fetch(
-    `https://api.themoviedb.org/3/configuration?api_key=${movieDbApiKey}`
+    `https://api.themoviedb.org/3/configuration?api_key=${movieDbApiKey}`,
+    {
+      next: {
+        revalidate: 3600,
+      },
+    }
   );
 
   config = await response.json();
@@ -97,7 +102,12 @@ export async function getTrendingMovies(
   } = {}
 ) {
   const response = await fetch(
-    `https://api.themoviedb.org/3/trending/movie/${timeWindow}?api_key=${movieDbApiKey}`
+    `https://api.themoviedb.org/3/trending/movie/${timeWindow}?api_key=${movieDbApiKey}`,
+    {
+      next: {
+        revalidate: 3600,
+      },
+    }
   );
 
   const tmdbJson = await response.json();
@@ -124,7 +134,12 @@ export async function getMovie(
   } = {}
 ) {
   const response = await fetch(
-    `https://api.themoviedb.org/3/movie/${movieId}?api_key=${movieDbApiKey}`
+    `https://api.themoviedb.org/3/movie/${movieId}?api_key=${movieDbApiKey}`,
+    {
+      next: {
+        revalidate: 3600,
+      },
+    }
   );
 
   const tmdbData = await response.json();
@@ -151,7 +166,12 @@ export async function searchMovies(
   } = {}
 ) {
   const response = await fetch(
-    `https://api.themoviedb.org/3/search/movie?api_key=${movieDbApiKey}&query=${searchTerm}`
+    `https://api.themoviedb.org/3/search/movie?api_key=${movieDbApiKey}&query=${searchTerm}`,
+    {
+      next: {
+        revalidate: 3600,
+      },
+    }
   );
 
   const tmdbJson = await response.json();

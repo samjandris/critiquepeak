@@ -66,8 +66,8 @@ export async function getUser(id: string): Promise<User> {
       // user.avatar = 'https://source.boringavatars.com/beam/' + encodeURIComponent(user.id); // Boring Avatars
     }
 
-    user.followingCount = await getFollowingCount(id);
-    user.followerCount = await getFollowerCount(id);
+    user.following_count = await getFollowingCount(id);
+    user.follower_count = await getFollowerCount(id);
   } catch (error) {}
 
   return user;

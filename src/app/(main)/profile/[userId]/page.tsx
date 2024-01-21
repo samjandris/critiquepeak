@@ -179,14 +179,14 @@ export default function ProfilePage({
                 size="sm"
                 onPress={() => setFollowersModalOpen(!followersModalOpen)}
               >
-                {truncateNumber(userData.followerCount) + ' Followers'}
+                {truncateNumber(userData.follower_count) + ' Followers'}
               </Button>
               <Button
                 variant="light"
                 size="sm"
                 onPress={() => setFollowingModalOpen(!followingModalOpen)}
               >
-                {truncateNumber(userData.followingCount) + ' Following'}
+                {truncateNumber(userData.following_count) + ' Following'}
               </Button>
             </div>
           </Skeleton>
@@ -214,7 +214,7 @@ export default function ProfilePage({
                         mutateAuthFollowingUser(false); // update follow state client side
                         mutateUser({
                           ...userData,
-                          followerCount: userData.followerCount - 1, // update follower count client side
+                          follower_count: userData.follower_count - 1, // update follower count client side
                         });
                       } else {
                         followUser(authUserData.id, userData.id);
@@ -222,7 +222,7 @@ export default function ProfilePage({
                         mutateAuthFollowingUser(true); // update follow state client side
                         mutateUser({
                           ...userData,
-                          followerCount: userData.followerCount + 1, // update follower count client side
+                          follower_count: userData.follower_count + 1, // update follower count client side
                         });
                       }
                     }
@@ -445,7 +445,7 @@ function EditProfileModal({
       });
 
     if (error) {
-      console.log(error);
+      console.error(error);
       return;
     }
   }

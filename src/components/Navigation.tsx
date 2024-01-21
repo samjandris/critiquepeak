@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import useSWR from 'swr';
 import {
   useDisclosure,
@@ -19,7 +19,13 @@ import {
   DropdownMenu,
   DropdownItem,
   DropdownSection,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  Tabs,
+  Tab,
 } from '@nextui-org/react';
+import Search from '@/components/Search';
 import ReviewFilmModal from '@/components/film/ReviewFilmModal';
 
 import { useAuth } from '@/components/AuthProvider';
@@ -29,6 +35,7 @@ import {
   FilmIcon,
   TVIcon,
   MusicNoteIcon,
+  SearchIcon,
 } from '@/components/Icons';
 
 import { getUser } from '@/lib/users';
@@ -49,10 +56,15 @@ const links = [
 ];
 
 export default function Navigation() {
+  const router = useRouter();
   const { user, signOut } = useAuth();
   const pathname = usePathname();
   const { isOpen: isFilmModalOpen, onOpenChange: handleFilmModalChange } =
     useDisclosure();
+  const {
+    isOpen: isSearchPopoverOpen,
+    onOpenChange: handleSearchPopoverChange,
+  } = useDisclosure();
 
   const { data: userData, isLoading: userDataIsLoading } = useSWR(
     ['user', user?.id],
@@ -121,6 +133,66 @@ export default function Navigation() {
                   </DropdownSection>
                 </DropdownMenu>
               </Dropdown>
+
+              <Popover
+                placement="bottom"
+                isOpen={isSearchPopoverOpen}
+                onOpenChange={handleSearchPopoverChange}
+              >
+                <PopoverTrigger>
+                  <Button variant="ghost" isIconOnly>
+                    <SearchIcon />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <Tabs variant="underlined" className="mt-2">
+                    <Tab
+                      title={
+                        <div className="flex items-center space-x-2">
+                          <FilmIcon />
+                          <span>Films</span>
+                        </div>
+                      }
+                    >
+                      <Search
+                        type="film"
+                        onSelectionChange={(film) => {
+                          handleSearchPopoverChange();
+                          router.push('/film/' + film.id);
+                        }}
+                      />
+                    </Tab>
+                    <Tab
+                      title={
+                        <div className="flex items-center space-x-2">
+                          <TVIcon />
+                          <span>Shows</span>
+                        </div>
+                      }
+                      isDisabled
+                    >
+                      <Search
+                        type="series"
+                        onSelectionChange={() => console.log('new series')}
+                      />
+                    </Tab>
+                    <Tab
+                      title={
+                        <div className="flex items-center space-x-2">
+                          <MusicNoteIcon />
+                          <span>Albums</span>
+                        </div>
+                      }
+                      isDisabled
+                    >
+                      <Search
+                        type="album"
+                        onSelectionChange={() => console.log('new album')}
+                      />
+                    </Tab>
+                  </Tabs>
+                </PopoverContent>
+              </Popover>
 
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>

@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { useDebounce, useMeasure } from '@uidotdev/usehooks';
 import useSWR from 'swr';
 import {
-  Autocomplete,
-  AutocompleteItem,
   Button,
   Checkbox,
   Image,
@@ -18,8 +16,10 @@ import {
   Skeleton,
   Textarea,
 } from '@nextui-org/react';
+import Search from '@/components/Search';
 import { StarRating } from '@/components/StarRating';
 import { searchMovies } from '@/lib/film';
+import { createMovieReview } from '@/lib/reviews';
 import { Film } from '@/lib/types';
 
 export default function ReviewFilmModal({
@@ -115,45 +115,49 @@ export default function ReviewFilmModal({
             Step 1: Search for a film
             */}
             {reviewStep === 1 && (
-              <Autocomplete
-                size="lg"
-                label="Search for a film"
-                menuTrigger="input"
-                onInputChange={(filmTitle) => {
-                  if (
-                    filmTitle.toLowerCase() !== searchTerm.toLowerCase() &&
-                    filmTitle.toLowerCase() !==
-                      selectedMovie?.title.toLowerCase()
-                  ) {
-                    setSearchTerm(filmTitle);
-                  }
-                }}
-                onSelectionChange={(filmId) => {
-                  if (!filmId) return;
-                  setSelectedMovie(
-                    searchResults?.find((film: Film) => film.id == filmId) ||
-                      null
-                  );
-                }}
-              >
-                {searchResults &&
-                  searchResults.map((film: Film) => (
-                    <AutocompleteItem
-                      key={film.id}
-                      startContent={
-                        <Image
-                          src={film.poster}
-                          alt={film.title}
-                          isBlurred
-                          shadow="md"
-                          className="h-12 aspect-[1/1.5] rounded-md object-contain"
-                        />
-                      }
-                    >
-                      {film.title}
-                    </AutocompleteItem>
-                  ))}
-              </Autocomplete>
+              <Search
+                type="film"
+                onSelectionChange={(film) => setSelectedMovie(film)}
+              />
+              // <Autocomplete
+              //   size="lg"
+              //   label="Search for a film"
+              //   menuTrigger="input"
+              //   onInputChange={(filmTitle) => {
+              //     if (
+              //       filmTitle.toLowerCase() !== searchTerm.toLowerCase() &&
+              //       filmTitle.toLowerCase() !==
+              //         selectedMovie?.title.toLowerCase()
+              //     ) {
+              //       setSearchTerm(filmTitle);
+              //     }
+              //   }}
+              //   onSelectionChange={(filmId) => {
+              //     if (!filmId) return;
+              //     setSelectedMovie(
+              //       searchResults?.find((film: Film) => film.id == filmId) ||
+              //         null
+              //     );
+              //   }}
+              // >
+              //   {searchResults &&
+              //     searchResults.map((film: Film) => (
+              //       <AutocompleteItem
+              //         key={film.id}
+              //         startContent={
+              //           <Image
+              //             src={film.poster}
+              //             alt={film.title}
+              //             isBlurred
+              //             shadow="md"
+              //             className="h-12 aspect-[1/1.5] rounded-md object-contain"
+              //           />
+              //         }
+              //       >
+              //         {film.title}
+              //       </AutocompleteItem>
+              //     ))}
+              // </Autocomplete>
             )}
 
             {/*
@@ -176,7 +180,12 @@ export default function ReviewFilmModal({
                       Rewatch?
                     </Checkbox>
                   </div>
-                  <StarRating rating={filmRating} className="w-[150px]" />
+                  <StarRating
+                    rating={filmRating}
+                    setRating={setFilmRating}
+                    isChangeable
+                    className="w-[150px]"
+                  />
                 </div>
                 {isReviewWritten && (
                   <Textarea
@@ -192,12 +201,12 @@ export default function ReviewFilmModal({
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="ghost" onClick={handleOpenClose}>
+          <Button variant="ghost" onPress={handleOpenClose}>
             Cancel
           </Button>
           <Button
             isDisabled={reviewStep <= 1}
-            onClick={() => {
+            onPress={() => {
               setReviewStep(reviewStep - 1);
             }}
           >
@@ -205,9 +214,16 @@ export default function ReviewFilmModal({
           </Button>
           <Button
             color="primary"
-            isDisabled={!selectedMovie}
-            onClick={() => {
+            isDisabled={!selectedMovie || (reviewStep >= 2 && filmRating === 0)}
+            onPress={() => {
               if (reviewStep >= 2) {
+                if (!selectedMovie || filmRating === 0) return;
+                createMovieReview(
+                  selectedMovie.id,
+                  filmRating,
+                  isReviewWritten ? reviewText : undefined,
+                  isRewatch
+                );
                 handleOpenClose();
               } else {
                 setReviewStep(reviewStep + 1);

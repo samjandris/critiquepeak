@@ -1,17 +1,17 @@
 'use client';
 
 import useSWR from 'swr';
+import Link from 'next/link';
 import NextImage from 'next/image';
 import {
   Card,
   CardHeader,
   CardBody,
   CardFooter,
-  Avatar,
-  Button,
   Chip,
   Image,
   Skeleton,
+  ScrollShadow,
 } from '@nextui-org/react';
 import UserChip from '@/components/user/UserChip';
 import { StarRating } from '@/components/StarRating';
@@ -50,7 +50,7 @@ export default function UserReview({
   }
 
   return (
-    <Card className={twMerge('min-w-[275px] max-w-[340px]', className)}>
+    <Card className={twMerge('min-w-[300px] max-w-[375px]', className)}>
       <CardHeader>
         <Skeleton isLoaded={!userIsLoading} className="w-full rounded-xl">
           {user ? (
@@ -88,24 +88,28 @@ export default function UserReview({
             {review.rating.toFixed(1)}
           </Chip>
         </div>
-        <div className="flex max-w-[350px] gap-3">
-          <div className="w-[50px] aspect-[2/3]">
+        <div className="flex gap-3">
+          <div className="min-w-[50px] w-[50px] aspect-[2/3]">
             <Skeleton
               isLoaded={!filmIsLoading}
               className="w-full h-full rounded-xl"
             >
-              <Image
-                as={NextImage}
-                src={film && film.poster}
-                alt="Poster for film"
-                width={0}
-                height={0}
-                sizes="5vw"
-                className="w-full"
-              />
+              <Link href={`/film/${film && film.id}`}>
+                <Image
+                  as={NextImage}
+                  src={film && film.poster}
+                  alt="Poster for film"
+                  width={0}
+                  height={0}
+                  sizes="10vw"
+                  className="w-full"
+                />
+              </Link>
             </Skeleton>
           </div>
-          <p className="leading-normal">{review.review}</p>
+          <ScrollShadow className="max-h-[175px]">
+            <p className="leading-normal">{review.review}</p>
+          </ScrollShadow>
         </div>
       </CardBody>
       <CardFooter className="gap-3">

@@ -9,6 +9,7 @@ import {
   NavbarBrand,
   NavbarContent,
   NavbarItem,
+  Skeleton,
   Button,
   Link,
   NavbarMenuToggle,
@@ -32,6 +33,7 @@ import ReviewFilmModal from '@/components/film/ReviewFilmModal';
 import { useAuth } from '@/components/AuthProvider';
 import {
   CritiquePeakLogo,
+  GearFillIcon,
   ComputerDesktopIcon,
   SunFillIcon,
   MoonStarsFillIcon,
@@ -62,8 +64,10 @@ const links = [
 export default function Navigation() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
-  const { user, signOut } = useAuth();
+  const { authLoaded, user, signOut } = useAuth();
   const pathname = usePathname();
+  const { isOpen: isUserDropdownOpen, onOpenChange: handleUserDropdownChange } =
+    useDisclosure();
   const { isOpen: isFilmModalOpen, onOpenChange: handleFilmModalChange } =
     useDisclosure();
   const {
@@ -86,7 +90,7 @@ export default function Navigation() {
             <p className="font-bold text-inherit ml-2">CritiquePeak</p>
           </Link>
         </NavbarBrand>
-        <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        <NavbarContent justify="center" className="hidden sm:flex gap-4">
           {links.map((link) => (
             <NavbarItem
               key={link.name}
@@ -98,16 +102,16 @@ export default function Navigation() {
             </NavbarItem>
           ))}
         </NavbarContent>
-        <NavbarContent
-          justify="end"
-          data-authloaded={!userDataIsLoading}
-          className="pointer-events-none opacity-0 data-[authloaded=true]:pointer-events-auto data-[authloaded=true]:opacity-100 transition-all"
-        >
-          {userData ? (
-            <NavbarContent as="div" justify="end">
+        {authLoaded && (
+          <NavbarContent justify="end">
+            {user && (
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
-                  <Button variant="ghost" startContent={<PlusIcon />}>
+                  <Button
+                    variant="ghost"
+                    radius="full"
+                    startContent={<PlusIcon />}
+                  >
                     Post
                   </Button>
                 </DropdownTrigger>
@@ -138,91 +142,113 @@ export default function Navigation() {
                   </DropdownSection>
                 </DropdownMenu>
               </Dropdown>
+            )}
 
-              <Popover
-                placement="bottom"
-                isOpen={isSearchPopoverOpen}
-                onOpenChange={handleSearchPopoverChange}
-              >
-                <PopoverTrigger>
-                  <Button variant="ghost" isIconOnly>
-                    <SearchIcon />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent>
-                  <Tabs variant="underlined" className="mt-2">
-                    <Tab
-                      title={
-                        <div className="flex items-center space-x-2">
-                          <FilmIcon />
-                          <span>Films</span>
-                        </div>
-                      }
-                    >
-                      <Search
-                        type="film"
-                        onSelectionChange={(film) => {
-                          handleSearchPopoverChange();
-                          router.push('/film/' + film.id);
-                        }}
-                      />
-                    </Tab>
-                    <Tab
-                      title={
-                        <div className="flex items-center space-x-2">
-                          <TVIcon />
-                          <span>Shows</span>
-                        </div>
-                      }
-                      isDisabled
-                    >
-                      <Search
-                        type="series"
-                        onSelectionChange={() => console.log('new series')}
-                      />
-                    </Tab>
-                    <Tab
-                      title={
-                        <div className="flex items-center space-x-2">
-                          <MusicNoteIcon />
-                          <span>Albums</span>
-                        </div>
-                      }
-                      isDisabled
-                    >
-                      <Search
-                        type="album"
-                        onSelectionChange={() => console.log('new album')}
-                      />
-                    </Tab>
-                  </Tabs>
-                </PopoverContent>
-              </Popover>
+            <Popover
+              placement="bottom"
+              isOpen={isSearchPopoverOpen}
+              onOpenChange={handleSearchPopoverChange}
+            >
+              <PopoverTrigger>
+                <Button variant="ghost" radius="full" isIconOnly>
+                  <SearchIcon />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent>
+                <Tabs variant="underlined" className="mt-2">
+                  <Tab
+                    title={
+                      <div className="flex items-center space-x-2">
+                        <FilmIcon />
+                        <span>Films</span>
+                      </div>
+                    }
+                  >
+                    <Search
+                      type="film"
+                      onSelectionChange={(film) => {
+                        handleSearchPopoverChange();
+                        router.push('/film/' + film.id);
+                      }}
+                    />
+                  </Tab>
+                  <Tab
+                    title={
+                      <div className="flex items-center space-x-2">
+                        <TVIcon />
+                        <span>Shows</span>
+                      </div>
+                    }
+                    isDisabled
+                  >
+                    <Search
+                      type="series"
+                      onSelectionChange={() => console.log('new series')}
+                    />
+                  </Tab>
+                  <Tab
+                    title={
+                      <div className="flex items-center space-x-2">
+                        <MusicNoteIcon />
+                        <span>Albums</span>
+                      </div>
+                    }
+                    isDisabled
+                  >
+                    <Search
+                      type="album"
+                      onSelectionChange={() => console.log('new album')}
+                    />
+                  </Tab>
+                </Tabs>
+              </PopoverContent>
+            </Popover>
 
-              <Dropdown placement="bottom-end">
-                <DropdownTrigger>
+            <Dropdown
+              placement="bottom-end"
+              onOpenChange={handleUserDropdownChange}
+            >
+              <DropdownTrigger>
+                {user ? (
                   <Avatar
                     isBordered
                     as="button"
                     size="sm"
-                    src={userData.avatar}
-                    className="transition-transform"
+                    src={userData?.avatar}
+                    className="ml-1 transition-transform"
                   />
-                </DropdownTrigger>
-                <DropdownMenu variant="flat">
+                ) : (
+                  <Button variant="ghost" radius="full" isIconOnly>
+                    <GearFillIcon
+                      data-open={isUserDropdownOpen}
+                      className="transition-all rotate-0 data-[open=true]:rotate-45"
+                    />
+                  </Button>
+                )}
+              </DropdownTrigger>
+              {user ? (
+                <DropdownMenu
+                  variant="flat"
+                  disabledKeys={userDataIsLoading ? ['profile'] : ['']}
+                >
                   <DropdownItem isReadOnly className="pointer-events-none">
-                    <p className="font-semibold leading-tight">{`${userData.first_name} ${userData.last_name}`}</p>
-                    <p className="font-semibold leading-tight">
-                      {`@${userData.username}`}
-                    </p>
+                    <Skeleton isLoaded={!userDataIsLoading}>
+                      <p className="font-semibold leading-tight">{`${userData?.first_name} ${userData?.last_name}`}</p>
+                      <p className="font-semibold leading-tight">
+                        {`@${userData?.username}`}
+                      </p>
+                    </Skeleton>
                   </DropdownItem>
-                  <DropdownItem href={'/profile/' + userData.username}>
+                  <DropdownItem
+                    key="profile"
+                    href={'/profile/' + userData?.username}
+                  >
                     Profile
                   </DropdownItem>
                   <DropdownItem
                     isReadOnly
                     closeOnSelect={false}
-                    className="min-w-[225px] hover:!bg-transparent pointer-events-none"
+                    className="min-w-[250px] hover:!bg-transparent pointer-events-none"
                     endContent={
                       <Tabs
                         size="sm"
@@ -248,21 +274,35 @@ export default function Navigation() {
                     Log Out
                   </DropdownItem>
                 </DropdownMenu>
-              </Dropdown>
-            </NavbarContent>
-          ) : (
-            <>
-              <NavbarItem className="">
-                <Link href="/login">Login</Link>
-              </NavbarItem>
-              <NavbarItem>
-                <Button as={Link} color="primary" href="/signup" variant="flat">
-                  Sign Up
-                </Button>
-              </NavbarItem>
-            </>
-          )}
-        </NavbarContent>
+              ) : (
+                <DropdownMenu variant="flat">
+                  <DropdownItem
+                    isReadOnly
+                    closeOnSelect={false}
+                    className="min-w-[250px] hover:!bg-transparent pointer-events-none"
+                    endContent={
+                      <Tabs
+                        size="sm"
+                        radius="full"
+                        defaultSelectedKey={theme}
+                        onSelectionChange={(mode) => setTheme(mode.toString())}
+                        className="pointer-events-auto"
+                      >
+                        <Tab key="system" title={<ComputerDesktopIcon />} />
+                        <Tab key="light" title={<SunFillIcon />} />
+                        <Tab key="dark" title={<MoonStarsFillIcon />} />
+                      </Tabs>
+                    }
+                  >
+                    Theme
+                  </DropdownItem>
+                  <DropdownItem href="/login">Login</DropdownItem>
+                  <DropdownItem href="/signup">Sign Up</DropdownItem>
+                </DropdownMenu>
+              )}
+            </Dropdown>
+          </NavbarContent>
+        )}
 
         <NavbarMenu>
           {links.map((link) => (

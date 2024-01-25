@@ -38,24 +38,29 @@ export default function UserChip({ userId }: { userId: string }) {
     <div className="w-full flex justify-between items-center gap-5">
       <Link
         href={'/profile/' + userData?.username}
-        className="flex gap-2.5 w-full"
+        className="flex gap-3 w-full"
       >
         <Avatar isBordered radius="full" size="md" src={userData?.avatar} />
-        {userData ? (
-          <div className="flex flex-col gap-0 items-start justify-center">
-            <h4 className="text-small font-semibold leading-none text-default-600">
-              {userData.first_name} {userData.last_name}
-            </h4>
-            <h5 className="text-small tracking-tight text-default-400">
-              @{userData.username}
-            </h5>
-          </div>
-        ) : (
-          <div className="flex flex-col flex-grow gap-1 items-start justify-center">
-            <Skeleton className="rounded-lg w-1/2 h-[15px]" />
-            <Skeleton className="rounded-lg w-1/4 h-[15px]" />
-          </div>
-        )}
+        <div className="flex flex-col gap-0.5 items-start justify-center">
+          <Skeleton
+            isLoaded={!userDataIsLoading}
+            className="rounded-lg data-[loaded]:rounded-none"
+          >
+            <p className="text-small font-semibold leading-tight text-default-600">
+              {userData
+                ? `${userData.first_name} ${userData.last_name}`
+                : '--------------------'}
+            </p>
+          </Skeleton>
+          <Skeleton
+            isLoaded={!userDataIsLoading}
+            className="rounded-lg data-[loaded]:rounded-none"
+          >
+            <p className="text-small tracking-tight leading-tight text-default-400">
+              @{userData ? userData.username : '------------'}
+            </p>
+          </Skeleton>
+        </div>
       </Link>
       {authUser && (
         <Button

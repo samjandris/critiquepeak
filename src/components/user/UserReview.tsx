@@ -29,13 +29,12 @@ export default function UserReview({
   review: FilmReview | SeriesReview | SeasonReview;
   className?: string;
 }) {
-  const {
-    data: user,
-    error: userError,
-    isLoading: userIsLoading,
-  } = useSWR(['user', review.user_id], () => {
-    return getUser(review.user_id);
-  });
+  const { data: user, error: userError } = useSWR(
+    ['user', review.user_id],
+    () => {
+      return getUser(review.user_id);
+    }
+  );
 
   const {
     data: film,
@@ -52,13 +51,7 @@ export default function UserReview({
   return (
     <Card className={twMerge('min-w-[300px] max-w-[375px]', className)}>
       <CardHeader>
-        <Skeleton isLoaded={!userIsLoading} className="w-full rounded-xl">
-          {user ? (
-            <UserChip userId={user.id} />
-          ) : (
-            <div className="w-full h-[45px]" />
-          )}
-        </Skeleton>
+        <UserChip userId={review.user_id} />
       </CardHeader>
       <CardBody className="px-3 py-0 text-small text-default-400">
         <div className="flex gap-2 mb-3">
@@ -89,21 +82,23 @@ export default function UserReview({
           </Chip>
         </div>
         <div className="flex gap-3">
-          <div className="min-w-[50px] w-[50px] aspect-[2/3]">
+          <div className="min-w-[50px] w-[50px]">
             <Skeleton
               isLoaded={!filmIsLoading}
-              className="w-full h-full rounded-xl"
+              className="w-full aspect-[2/3] rounded-xl"
             >
               <Link href={`/film/${film && film.id}`}>
-                <Image
-                  as={NextImage}
-                  src={film && film.poster}
-                  alt="Poster for film"
-                  width={0}
-                  height={0}
-                  sizes="10vw"
-                  className="w-full"
-                />
+                {film && (
+                  <Image
+                    as={NextImage}
+                    src={film.poster}
+                    alt="Poster for film"
+                    width={0}
+                    height={0}
+                    sizes="10vw"
+                    className="w-full"
+                  />
+                )}
               </Link>
             </Skeleton>
           </div>
@@ -117,7 +112,7 @@ export default function UserReview({
           <p className="font-semibold text-default-400 text-small">
             {user ? truncateNumber(user.following_count) : '--'}
           </p>
-          <p className=" text-default-400 text-small">Following</p>
+          <p className="text-default-400 text-small">Following</p>
         </div>
         <div className="flex gap-1">
           <p className="font-semibold text-default-400 text-small">

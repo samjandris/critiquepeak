@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import useSWR from 'swr';
 import {
   useDisclosure,
@@ -31,6 +32,9 @@ import ReviewFilmModal from '@/components/film/ReviewFilmModal';
 import { useAuth } from '@/components/AuthProvider';
 import {
   CritiquePeakLogo,
+  ComputerDesktopIcon,
+  SunFillIcon,
+  MoonStarsFillIcon,
   PlusIcon,
   FilmIcon,
   TVIcon,
@@ -57,6 +61,7 @@ const links = [
 
 export default function Navigation() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const { user, signOut } = useAuth();
   const pathname = usePathname();
   const { isOpen: isFilmModalOpen, onOpenChange: handleFilmModalChange } =
@@ -213,6 +218,26 @@ export default function Navigation() {
                   </DropdownItem>
                   <DropdownItem href={'/profile/' + userData.username}>
                     Profile
+                  </DropdownItem>
+                  <DropdownItem
+                    isReadOnly
+                    closeOnSelect={false}
+                    className="min-w-[225px] hover:!bg-transparent pointer-events-none"
+                    endContent={
+                      <Tabs
+                        size="sm"
+                        radius="full"
+                        defaultSelectedKey={theme}
+                        onSelectionChange={(mode) => setTheme(mode.toString())}
+                        className="pointer-events-auto"
+                      >
+                        <Tab key="system" title={<ComputerDesktopIcon />} />
+                        <Tab key="light" title={<SunFillIcon />} />
+                        <Tab key="dark" title={<MoonStarsFillIcon />} />
+                      </Tabs>
+                    }
+                  >
+                    Theme
                   </DropdownItem>
                   <DropdownItem
                     color="danger"

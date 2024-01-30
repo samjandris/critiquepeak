@@ -38,7 +38,8 @@ export default function UserChip({ userId }: { userId: string }) {
     <div className="w-full flex justify-between items-center gap-5">
       <Link
         href={'/profile/' + userData?.username}
-        className="flex gap-3 w-full"
+        data-loading={userDataIsLoading}
+        className="flex gap-3 w-full data-[loading=true]:pointer-events-none"
       >
         <Avatar isBordered radius="full" size="md" src={userData?.avatar} />
         <div className="flex flex-col gap-0.5 items-start justify-center">

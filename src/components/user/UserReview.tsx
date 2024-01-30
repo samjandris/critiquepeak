@@ -24,9 +24,13 @@ import { twMerge } from 'tailwind-merge';
 
 export default function UserReview({
   review,
+  hideType,
+  hidePoster,
   className,
 }: {
   review: FilmReview | SeriesReview | SeasonReview;
+  hideType?: boolean;
+  hidePoster?: boolean;
   className?: string;
 }) {
   const { data: user, error: userError } = useSWR(
@@ -55,7 +59,7 @@ export default function UserReview({
       </CardHeader>
       <CardBody className="px-3 py-0 text-small text-default-400">
         <div className="flex gap-2 mb-3">
-          <Chip size="sm">{'Film'}</Chip>
+          {!hideType && <Chip size="sm">{'Film'}</Chip>}
           <Chip
             color={
               review.rating >= 3.5
@@ -82,26 +86,28 @@ export default function UserReview({
           </Chip>
         </div>
         <div className="flex gap-3">
-          <div className="min-w-[50px] w-[50px]">
-            <Skeleton
-              isLoaded={!filmIsLoading}
-              className="w-full aspect-[2/3] rounded-xl"
-            >
-              <Link href={`/film/${film && film.id}`}>
-                {film && (
-                  <Image
-                    as={NextImage}
-                    src={film.poster}
-                    alt="Poster for film"
-                    width={0}
-                    height={0}
-                    sizes="10vw"
-                    className="w-full"
-                  />
-                )}
-              </Link>
-            </Skeleton>
-          </div>
+          {!hidePoster && (
+            <div className="min-w-[50px] w-[50px]">
+              <Skeleton
+                isLoaded={!filmIsLoading}
+                className="w-full aspect-[2/3] rounded-xl"
+              >
+                <Link href={`/film/${film && film.id}`}>
+                  {film && (
+                    <Image
+                      as={NextImage}
+                      src={film.poster}
+                      alt="Poster for film"
+                      width={0}
+                      height={0}
+                      sizes="10vw"
+                      className="w-full"
+                    />
+                  )}
+                </Link>
+              </Skeleton>
+            </div>
+          )}
           <ScrollShadow className="max-h-[175px]">
             <p className="leading-normal">{review.review}</p>
           </ScrollShadow>

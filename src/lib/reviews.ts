@@ -44,3 +44,22 @@ export async function getRecentMovieReviews(): Promise<FilmReview[]> {
 
   return data;
 }
+
+export async function getRecentReviews(filmId: number): Promise<FilmReview[]> {
+  const supabase = getServer(cookies());
+
+  const { data, error } = await supabase
+    .from('movie_reviews')
+    .select('*')
+    .eq('movie_id', filmId)
+    .not('review', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if (error) {
+    console.error('Error getting recent reviews', error);
+    throw error;
+  }
+
+  return data;
+}

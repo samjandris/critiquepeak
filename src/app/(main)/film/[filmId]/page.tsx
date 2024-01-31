@@ -73,7 +73,7 @@ export default async function FilmDetails({
 
           {filmDetails.budget > 0 && (
             <div>
-              <div className="flex gap-1 justify-center items-center text-default-800">
+              <div className="flex gap-1.5 justify-center items-center text-default-800">
                 <DollarCircleIcon width="1.15em" height="1.15em" />
                 <h4>Budget</h4>
               </div>

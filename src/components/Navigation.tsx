@@ -50,14 +50,17 @@ const links = [
   {
     name: 'Film',
     href: '/film',
+    isDisabled: false,
   },
   {
     name: 'TV',
     href: '/tv',
+    isDisabled: true,
   },
   {
     name: 'Music',
     href: '/music',
+    isDisabled: true,
   },
 ];
 
@@ -96,7 +99,11 @@ export default function Navigation() {
               key={link.name}
               isActive={pathname.startsWith(link.href)}
             >
-              <Link color="foreground" href={link.href}>
+              <Link
+                color="foreground"
+                href={link.href}
+                isDisabled={link.isDisabled}
+              >
                 {link.name}
               </Link>
             </NavbarItem>
@@ -315,6 +322,7 @@ export default function Navigation() {
                 className="w-full"
                 href={link.href}
                 size="lg"
+                isDisabled={link.isDisabled}
               >
                 {link.name}
               </Link>

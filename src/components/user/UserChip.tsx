@@ -47,7 +47,7 @@ export default function UserChip({ userId }: { userId: string }) {
             isLoaded={!userDataIsLoading}
             className="rounded-lg data-[loaded]:rounded-none"
           >
-            <p className="text-small font-semibold leading-tight text-default-600">
+            <p className="text-small font-semibold leading-tight text-default-800">
               {userData
                 ? `${userData.first_name} ${userData.last_name}`
                 : '--------------------'}
@@ -145,7 +145,7 @@ export function UserChipDumb({
           // src={user.avatar}
         />
         <div className="flex flex-col gap-0 items-start justify-center">
-          <h4 className="text-small font-semibold leading-none text-default-600">
+          <h4 className="text-small font-semibold leading-none text-default-800">
             {user.first_name} {user.last_name}
           </h4>
           <h5 className="text-small tracking-tight text-default-400">

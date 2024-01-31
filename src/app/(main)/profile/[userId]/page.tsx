@@ -106,13 +106,7 @@ export default function ProfilePage({
     );
   }
 
-  if (
-    userIdError ||
-    userDataError ||
-    authUserError ||
-    userFollowingAuthError ||
-    authFollowingUserError
-  ) {
+  if (authUserError || userFollowingAuthError || authFollowingUserError) {
     return (
       <div className="flex justify-center items-center h-[90vh]">
         <Card>
@@ -128,7 +122,7 @@ export default function ProfilePage({
     );
   }
 
-  if (!userData) {
+  if (userIdError || userDataError || !userData) {
     return (
       <div className="flex justify-center items-center h-[90vh]">
         <Card>
@@ -160,7 +154,7 @@ export default function ProfilePage({
                 {userData.first_name} {userData.last_name}
               </h1>
               <div className="flex justify-center items-center gap-3">
-                <p className="text-gray-500 leading-tight">
+                <p className="text-default-500 leading-tight">
                   @{userData.username}
                 </p>
                 {isUserFollowingAuth && (

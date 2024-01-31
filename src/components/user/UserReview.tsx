@@ -109,7 +109,7 @@ export default function UserReview({
             </div>
           )}
           <ScrollShadow className="max-h-[175px]">
-            <p className="leading-normal">{review.review}</p>
+            <p className="leading-normal text-default-700">{review.review}</p>
           </ScrollShadow>
         </div>
       </CardBody>

@@ -4,6 +4,12 @@ import { Image, Chip } from '@nextui-org/react';
 import { StarRatingPrecise } from '@/components/StarRating';
 import UserReview from '@/components/user/UserReview';
 
+import {
+  CalendarFillIcon,
+  ClockFillIcon,
+  DollarCircleIcon,
+} from '@/components/Icons';
+
 import { getMovie } from '@/lib/film';
 import { getRecentReviews } from '@/lib/reviews';
 import { truncateNumber, getOrdinalDate } from '@/lib/misc';
@@ -43,24 +49,37 @@ export default async function FilmDetails({
             </Chip>
           )}
 
-          <p className="text-gray-500">{filmDetails.overview}</p>
+          <p className="text-default-600">{filmDetails.overview}</p>
         </div>
 
-        <div className="flex flex-col justify-center gap-4">
+        <div className="flex flex-col justify-center text-center gap-6">
           <div>
-            <h3 className="text-gray-500">Release date</h3>
-            <p>{getOrdinalDate(filmDetails.releaseDate)}</p>
+            <div className="flex gap-2 justify-center items-center text-default-800">
+              <CalendarFillIcon />
+              <h4>Release date</h4>
+            </div>
+            <p className="text-default-500">
+              {getOrdinalDate(filmDetails.releaseDate)}
+            </p>
           </div>
 
           <div>
-            <h3 className="text-gray-500">Runtime</h3>
-            <p>{filmDetails.runtime} minutes</p>
+            <div className="flex gap-2 justify-center items-center text-default-800">
+              <ClockFillIcon />
+              <h4>Runtime</h4>
+            </div>
+            <p className="text-default-500">{filmDetails.runtime} minutes</p>
           </div>
 
           {filmDetails.budget > 0 && (
             <div>
-              <h3 className="text-gray-500">Budget</h3>
-              <p>{truncateNumber(filmDetails.budget)}</p>
+              <div className="flex gap-1 justify-center items-center text-default-800">
+                <DollarCircleIcon width="1.15em" height="1.15em" />
+                <h4>Budget</h4>
+              </div>
+              <p className="text-default-500">
+                {truncateNumber(filmDetails.budget)}
+              </p>
             </div>
           )}
         </div>
@@ -75,7 +94,7 @@ export default async function FilmDetails({
 
       <div className="flex flex-col items-center gap-4">
         {recentReviews.length === 0 ? (
-          <p className="text-gray-500">No reviews yet</p>
+          <p className="text-default-500">No reviews yet</p>
         ) : (
           <>
             <h4>Recent reviews</h4>

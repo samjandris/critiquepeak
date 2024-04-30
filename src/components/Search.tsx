@@ -33,6 +33,8 @@ export default function Search({
       size="lg"
       label={'Search for a ' + type}
       menuTrigger="input"
+      items={searchResults || []}
+      isLoading={searchResultsIsLoading}
       onInputChange={(searchInput) => {
         if (
           searchInput.toLowerCase() !== searchTerm.toLowerCase() &&
@@ -50,23 +52,22 @@ export default function Search({
       }}
       className={className}
     >
-      {searchResults &&
-        searchResults.map((item: Film) => (
-          <AutocompleteItem
-            key={item.id}
-            startContent={
-              <Image
-                src={item.poster}
-                alt={item.title}
-                isBlurred
-                shadow="md"
-                className="h-12 aspect-[1/1.5] rounded-md object-contain"
-              />
-            }
-          >
-            {item.title}
-          </AutocompleteItem>
-        ))}
+      {(result: Film) => (
+        <AutocompleteItem
+          key={result.id}
+          startContent={
+            <Image
+              src={result.poster}
+              alt={result.title}
+              isBlurred
+              shadow="md"
+              className="h-12 aspect-[1/1.5] rounded-md object-contain"
+            />
+          }
+        >
+          {result.title}
+        </AutocompleteItem>
+      )}
     </Autocomplete>
   );
 }

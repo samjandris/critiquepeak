@@ -1,5 +1,7 @@
 'use server';
 
+import { Film } from '@/lib/types';
+
 const movieDbApiKey = process.env.TMDB_API_KEY;
 const movieDbHeaders = {
   accept: 'application/json',
@@ -100,7 +102,7 @@ export async function getTrendingMovies(
     posterSize = defaults.posterSize,
     backdropSize = defaults.backdropSize,
   } = {}
-) {
+): Promise<Film[]> {
   const response = await fetch(
     `https://api.themoviedb.org/3/trending/movie/${timeWindow}?api_key=${movieDbApiKey}`,
     {
@@ -126,13 +128,39 @@ export async function getTrendingMovies(
   });
 }
 
+export async function getMoviesInTheaters(): Promise<Film[]> {
+  const response = await fetch(
+    `https://api.themoviedb.org/3/movie/now_playing?api_key=${movieDbApiKey}`,
+    {
+      next: {
+        revalidate: 3600,
+      },
+    }
+  );
+
+  const tmdbJson = await response.json();
+  const tmdbData = tmdbJson.results;
+
+  return tmdbData.map((movie: any) => {
+    return {
+      id: movie.id,
+      title: movie.title,
+      overview: movie.overview,
+      poster: `${config.images.secure_base_url}${defaults.posterSize}${movie.poster_path}`,
+      backdrop: `${config.images.secure_base_url}${defaults.backdropSize}${movie.backdrop_path}`,
+      releaseDate: new Date(movie.release_date),
+      averageRating: movie.vote_average / 2,
+    };
+  });
+}
+
 export async function getMovie(
   movieId: string,
   {
     posterSize = defaults.posterSize,
     backdropSize = defaults.backdropSize,
   } = {}
-) {
+): Promise<Film> {
   const response = await fetch(
     `https://api.themoviedb.org/3/movie/${movieId}?api_key=${movieDbApiKey}`,
     {
@@ -164,7 +192,7 @@ export async function searchMovies(
     posterSize = defaults.posterSize,
     backdropSize = defaults.backdropSize,
   } = {}
-) {
+): Promise<Film[]> {
   const response = await fetch(
     `https://api.themoviedb.org/3/search/movie?api_key=${movieDbApiKey}&query=${searchTerm}`,
     {

@@ -11,7 +11,7 @@ export default function Search({
   className,
 }: {
   type: string;
-  onSelectionChange: (item: Film) => void;
+  onSelectionChange: (item: Film | null) => void;
   className?: string;
 }) {
   const [searchTerm, setSearchTerm] = useState('');

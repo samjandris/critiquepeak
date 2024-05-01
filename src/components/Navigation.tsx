@@ -174,6 +174,7 @@ export default function Navigation() {
                     <Search
                       type="film"
                       onSelectionChange={(film) => {
+                        if (!film) return;
                         handleSearchPopoverChange();
                         router.push('/film/' + film.id);
                       }}

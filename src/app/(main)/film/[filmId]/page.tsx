@@ -71,7 +71,7 @@ export default async function FilmDetails({
             <p className="text-default-500">{filmDetails.runtime} minutes</p>
           </div>
 
-          {filmDetails.budget > 0 && (
+          {filmDetails.budget && filmDetails.budget > 0 && (
             <div>
               <div className="flex gap-1.5 justify-center items-center text-default-800">
                 <DollarCircleIcon width="1.15em" height="1.15em" />

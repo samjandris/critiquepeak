@@ -7,7 +7,7 @@ import {
   StarOutlineIcon,
   StarPartialIcon,
 } from '@/components/Icons';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '@nextui-org/react';
 
 export function StarRating({
   rating,
@@ -77,7 +77,7 @@ export function StarRating({
         setRating && setRating(hoverRating);
         setIsHovering(false);
       }}
-      className={twMerge('flex gap-0.5', className)}
+      className={cn('flex gap-0.5', className)}
     >
       {stars.map((star) => star)}
     </div>
@@ -116,5 +116,5 @@ export function StarRatingPrecise({
     );
   }
 
-  return <div className={twMerge('flex gap-0.5', className)}>{stars}</div>;
+  return <div className={cn('flex gap-0.5', className)}>{stars}</div>;
 }

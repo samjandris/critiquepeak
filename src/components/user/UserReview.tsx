@@ -20,7 +20,7 @@ import { getUser } from '@/lib/users';
 import { getMovie } from '@/lib/film';
 import { FilmReview, SeriesReview, SeasonReview } from '@/lib/types';
 import { truncateNumber } from '@/lib/misc';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '@nextui-org/react';
 
 export default function UserReview({
   review,
@@ -53,7 +53,7 @@ export default function UserReview({
   }
 
   return (
-    <Card className={twMerge('min-w-[300px] max-w-[375px]', className)}>
+    <Card className={cn('min-w-[300px] max-w-[375px]', className)}>
       <CardHeader>
         <UserChip userId={review.user_id} />
       </CardHeader>

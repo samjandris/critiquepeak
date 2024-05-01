@@ -6,7 +6,7 @@ import useEmblaCarousel, {
 } from 'embla-carousel-react';
 import { ArrowLeftIcon, ArrowRightIcon } from '@/components/Icons';
 
-import { twMerge as cn } from 'tailwind-merge';
+import { cn } from '@nextui-org/react';
 import { Button } from '@nextui-org/react';
 
 type CarouselApi = UseEmblaCarouselType[1];

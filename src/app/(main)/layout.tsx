@@ -25,7 +25,7 @@ export default function MainLayout({
         </p>
         <div className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link
-            href="/contact"
+            href="mailto:critiquepeak@gmail.com"
             className="text-xs hover:underline underline-offset-4"
           >
             Contact

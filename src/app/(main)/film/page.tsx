@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import NextImage from 'next/image';
 
-import { Image } from '@nextui-org/react';
+import FilmBackdrop from '@/components/film/FilmBackdrop';
 import FilmCarousel from '@/components/film/FilmCarousel';
 import UserReviewCarousel from '@/components/user/UserReviewCarousel';
 
@@ -19,19 +18,8 @@ export default async function FilmPage() {
     <main>
       <section className="w-full bg-gray-900 py-20 md:py-32 lg:py-40">
         <div className="px-4 md:px-6">
-          <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-            <div className="flex flex-col items-center space-y-4 p-5">
-              <Image
-                as={NextImage}
-                src={randomMovie.backdrop}
-                alt="Movie Backdrop"
-                width="1200"
-                height="600"
-                isBlurred
-                className="mx-auto aspect-[2/1] overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
-              />
-              <p className="text-gray-400 md:text-xl">{randomMovie.title}</p>
-            </div>
+          <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px] px-5">
+            <FilmBackdrop film={randomMovie} />
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter text-gray-50 sm:text-5xl xl:text-6xl/none">

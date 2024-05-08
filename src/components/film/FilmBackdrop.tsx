@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import NextImage from 'next/image';
 
 import { Card, CardHeader, Image } from '@nextui-org/react';
 
@@ -45,12 +44,9 @@ export default function FilmBackdrop({
             </CardHeader>
           )}
           <Image
-            as={NextImage}
             src={film.backdrop}
             alt={'Film poster for ' + film.title + '.'}
-            width={0}
-            height={0}
-            sizes="100vw"
+            isBlurred
             className="w-full"
           />
         </Card>

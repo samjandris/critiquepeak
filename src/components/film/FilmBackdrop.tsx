@@ -28,7 +28,7 @@ export default function FilmBackdrop({
             >
               <div
                 className={cn(
-                  'flex flex-col px-2 py-2 pb-1 items-start bg-gray-900 opacity-75 shadow-xl',
+                  'flex flex-col px-2 py-2 pb-1 items-start bg-gray-900 opacity-85 shadow-xl',
                   labelPosition === 'top' && 'rounded-tl-xl rounded-br-xl',
                   labelPosition === 'bottom' && 'rounded-bl-xl rounded-tr-xl'
                 )}

@@ -1,23 +1,18 @@
 import Link from 'next/link';
-import { Button } from '@nextui-org/react';
 
-export default function NotFound() {
+export default async function NotFound() {
   return (
-    <main className="flex justify-center items-center h-screen">
-      <div className="bg-content2 p-6 rounded-3xl shadow-lg justify-center">
-        <h1 className="text-center">404 - Page Not Found</h1>
-        <div className="mt-5 mb-5">
-          <h4 className="text-center">
-            Oops! The page you are looking for does not exist.
-          </h4>
-          <h4 className="text-center">It might have been moved or deleted.</h4>
-        </div>
-        <div className="flex justify-center">
-          <Link href="/">
-            <Button>Go Home</Button>
-          </Link>
-        </div>
-      </div>
+    <main className="flex h-[100dvh] w-full flex-col items-center justify-center gap-6">
+      <h1 className="text-9xl font-bold tracking-tighter">404</h1>
+      <p className="max-w-md text-center text-gray-500 dark:text-gray-400">
+        Oops, the page you are looking for could not be found.
+      </p>
+      <Link
+        className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-6 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
+        href="/"
+      >
+        Go to Homepage
+      </Link>
     </main>
   );
 }

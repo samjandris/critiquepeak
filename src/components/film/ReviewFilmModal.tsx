@@ -15,6 +15,7 @@ import {
   ScrollShadow,
   Skeleton,
   Textarea,
+  cn,
 } from '@nextui-org/react';
 import Search from '@/components/Search';
 import { StarRating } from '@/components/StarRating';
@@ -86,11 +87,12 @@ export default function ReviewFilmModal({
               </div>
               <div
                 style={{
-                  height: posterHeight || 0,
+                  height: (posterHeight && Math.round(posterHeight)) || 0, // Math.round needed to fix chrome resizing modal indefinitely
                 }}
-                className={
-                  'flex flex-col ' + (selectedMovie ? 'gap-1' : 'gap-4')
-                }
+                className={cn(
+                  'flex flex-col',
+                  selectedMovie ? 'gap-1' : 'gap-4'
+                )}
               >
                 {selectedMovie ? (
                   <p className="text-medium font-bold leading-5">

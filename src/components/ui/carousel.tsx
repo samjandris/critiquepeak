@@ -6,8 +6,7 @@ import useEmblaCarousel, {
 } from 'embla-carousel-react';
 import { ArrowLeftIcon, ArrowRightIcon } from '@/components/Icons';
 
-import { cn } from '@nextui-org/react';
-import { Button } from '@nextui-org/react';
+import { Button, cn } from '@nextui-org/react';
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;

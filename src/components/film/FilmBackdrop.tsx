@@ -1,9 +1,8 @@
 import Link from 'next/link';
 
-import { Card, CardHeader, Image } from '@nextui-org/react';
+import { Card, CardHeader, Image, cn } from '@nextui-org/react';
 
 import { Film } from '@/lib/types';
-import { cn } from '@nextui-org/react';
 
 export default function FilmBackdrop({
   film,

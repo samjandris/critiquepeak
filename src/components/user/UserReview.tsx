@@ -12,6 +12,7 @@ import {
   Image,
   Skeleton,
   ScrollShadow,
+  cn,
 } from '@nextui-org/react';
 import UserChip from '@/components/user/UserChip';
 import { StarRating } from '@/components/StarRating';
@@ -20,7 +21,6 @@ import { getUser } from '@/lib/users';
 import { getMovie } from '@/lib/film';
 import { FilmReview, SeriesReview, SeasonReview } from '@/lib/types';
 import { truncateNumber } from '@/lib/misc';
-import { cn } from '@nextui-org/react';
 
 export default function UserReview({
   review,
@@ -95,12 +95,12 @@ export default function UserReview({
                 <Link href={`/film/${film && film.id}`}>
                   {film && (
                     <Image
-                      as={NextImage}
+                      // as={NextImage}
                       src={film.poster}
                       alt="Poster for film"
-                      width={0}
-                      height={0}
-                      sizes="10vw"
+                      // width={0}
+                      // height={0}
+                      // sizes="10vw"
                       className="w-full"
                     />
                   )}

@@ -1,7 +1,5 @@
 'use client';
 
-import Image from 'next/image';
-
 import { useState, useEffect, useRef, ChangeEvent } from 'react';
 import useSWR from 'swr';
 import {
@@ -18,6 +16,7 @@ import {
   ModalFooter,
   Avatar,
   Input,
+  Image,
 } from '@nextui-org/react';
 import UserChip from '@/components/user/UserChip';
 import { useAuth } from '@/components/AuthProvider';
@@ -143,8 +142,8 @@ export default function ProfilePage({
             <Image
               src={userData.avatar}
               alt={'Profile picture for ' + userData.username}
-              fill
-              className="object-cover"
+              isBlurred
+              className="w-full object-cover"
             />
           </Skeleton>
 

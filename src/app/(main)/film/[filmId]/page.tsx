@@ -1,5 +1,3 @@
-import NextImage from 'next/image';
-
 import { Image, Chip } from '@nextui-org/react';
 import { StarRatingPrecise } from '@/components/StarRating';
 import UserReview from '@/components/user/UserReview';
@@ -29,12 +27,8 @@ export default async function FilmDetails({
     <div className="flex flex-col gap-8 p-8">
       <div className="grid grid-cols-4 gap-5">
         <Image
-          as={NextImage}
           src={filmDetails.poster}
           alt={'Poster for the film ' + filmDetails.title}
-          width={0}
-          height={0}
-          sizes="25vw"
           shadow="md"
           isBlurred
           className="w-full"

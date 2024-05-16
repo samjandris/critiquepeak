@@ -2,7 +2,6 @@
 
 import useSWR from 'swr';
 import Link from 'next/link';
-import NextImage from 'next/image';
 import {
   Card,
   CardHeader,
@@ -95,12 +94,9 @@ export default function UserReview({
                 <Link href={`/film/${film && film.id}`}>
                   {film && (
                     <Image
-                      // as={NextImage}
                       src={film.poster}
                       alt="Poster for film"
-                      // width={0}
-                      // height={0}
-                      // sizes="10vw"
+                      isBlurred
                       className="w-full"
                     />
                   )}

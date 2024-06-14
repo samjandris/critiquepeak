@@ -6,15 +6,22 @@ import { Film } from '@/lib/types';
 
 export default function FilmPoster({
   film,
+  isHoverable = true,
+  isPressable = true,
   className,
 }: {
   film: Film;
+  isHoverable?: boolean;
+  isPressable?: boolean;
   className?: string;
 }) {
   return (
     <div className={cn('aspect-[2/3]', className)}>
       <Link href={`/film/${film.id}`}>
-        <Card isPressable className="border-none hover:scale-105">
+        <Card
+          isPressable={isPressable}
+          className={cn('border-none', isHoverable && 'hover:scale-105')}
+        >
           <Image
             src={film.poster}
             alt={'Film poster for ' + film.title + '.'}

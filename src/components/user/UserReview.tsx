@@ -9,7 +9,6 @@ import {
   CardBody,
   CardFooter,
   Chip,
-  Image,
   Skeleton,
   ScrollShadow,
   cn,
@@ -20,7 +19,12 @@ import { StarRating } from '@/components/StarRating';
 import { HeartOutlineIcon, HeartFillIcon } from '@/components/Icons';
 
 import { useAuth } from '@/components/AuthProvider';
-import { getUser } from '@/lib/users';
+import { getUser, didUserLikeMovieReview } from '@/lib/users';
+import {
+  getMovieReviewLikes,
+  likeMovieReview,
+  unlikeMovieReview,
+} from '@/lib/reviews';
 import { getMovie } from '@/lib/film';
 import { FilmReview, SeriesReview, SeasonReview } from '@/lib/types';
 import { truncateNumber } from '@/lib/misc';
@@ -38,19 +42,31 @@ export default function UserReview({
 }) {
   const { user: authUser } = useAuth();
 
-  const { data: authUserData, isLoading: authUserDataIsLoading } = useSWR(
-    ['user', authUser?.id],
-    () => authUser && getUser(authUser.id)
+  const {
+    data: authUserData,
+    error: authUserError,
+    isLoading: authUserDataIsLoading,
+  } = useSWR(['user', authUser?.id], () => authUser && getUser(authUser.id));
+
+  const {
+    data: userDidLike,
+    error: userDidLikeError,
+    isLoading: userDidLikeIsLoading,
+    mutate: mutateUserDidLike,
+  } = useSWR(
+    ['userDidLike', authUser?.id, review.id],
+    () => authUser && didUserLikeMovieReview(authUser?.id, review.id)
   );
 
-  const { data: user, error: userError } = useSWR(
-    ['user', review.user_id],
-    () => {
-      return getUser(review.user_id);
-    }
-  );
+  const {
+    data: reviewLikes,
+    error: reviewLikesError,
+    isLoading: reviewLikesIsLoading,
+    mutate: mutateReviewLikes,
+  } = useSWR(['reviewLikes', review.id], () => {
+    return getMovieReviewLikes(review.id);
+  });
 
-  const [userDidLike, setUserDidLike] = useState(false); // TODO: get from user's likes [review.id]
   const [isHoveringLike, setIsHoveringLike] = useState(false);
 
   const {
@@ -61,7 +77,7 @@ export default function UserReview({
     return getMovie((review as FilmReview).movie_id);
   });
 
-  if (userError || filmError) {
+  if (authUserError || userDidLikeError || reviewLikesError || filmError) {
     return <p>Error</p>;
   }
 
@@ -95,26 +111,29 @@ export default function UserReview({
         </div>
       </CardBody>
       <CardFooter className="gap-2 justify-between">
-        {/* <div className="flex gap-1">
-          <p className="font-semibold text-default-400 text-small">
-            {user ? truncateNumber(user.following_count) : '--'}
-          </p>
-          <p className="text-default-400 text-small">Following</p>
-        </div>
-        <div className="flex gap-1">
-          <p className="font-semibold text-default-400 text-small">
-            {user ? truncateNumber(user.follower_count) : '--'}
-          </p>
-          <p className="text-default-400 text-small">Followers</p>
-        </div> */}
-
         <div
           onMouseEnter={() => setIsHoveringLike(true)}
           onMouseLeave={() => setIsHoveringLike(false)}
-          onClick={() => setUserDidLike(!userDidLike)}
+          onClick={() => {
+            if (!userDidLike) {
+              likeMovieReview(review.id);
+
+              mutateUserDidLike(true);
+              mutateReviewLikes((prev) => (prev || 0) + 1);
+            } else {
+              unlikeMovieReview(review.id);
+
+              mutateUserDidLike(false);
+              mutateReviewLikes((prev) => (prev || 0) - 1);
+            }
+          }}
           className={cn(
             'flex gap-2 items-center hover:cursor-pointer hover:scale-110 active:scale-95 transition-all',
-            !authUserDataIsLoading && !authUserData && 'pointer-events-none'
+            (authUserDataIsLoading ||
+              userDidLikeIsLoading ||
+              reviewLikesIsLoading ||
+              !authUserData) &&
+              'pointer-events-none'
           )}
         >
           <div className="relative w-5 h-5">
@@ -126,7 +145,11 @@ export default function UserReview({
                   ? isHoveringLike
                     ? 'opacity-100'
                     : 'opacity-0'
-                  : 'opacity-100'
+                  : 'opacity-100',
+                (authUserDataIsLoading ||
+                  userDidLikeIsLoading ||
+                  reviewLikesIsLoading) &&
+                  'scale-80 opacity-25'
               )}
             />
 
@@ -138,13 +161,21 @@ export default function UserReview({
                   ? isHoveringLike
                     ? 'opacity-30'
                     : 'opacity-100'
-                  : 'opacity-0'
+                  : 'opacity-0',
+                (authUserDataIsLoading ||
+                  userDidLikeIsLoading ||
+                  reviewLikesIsLoading) &&
+                  'scale-80'
               )}
             />
           </div>
 
           <p className="font-semibold text-default-400 text-small">
-            {truncateNumber(143)}
+            {!authUserDataIsLoading &&
+            !userDidLikeIsLoading &&
+            !reviewLikesIsLoading
+              ? truncateNumber(reviewLikes || 0)
+              : '--'}
           </p>
         </div>
 

@@ -155,6 +155,13 @@ export default function Navigation() {
               placement="bottom"
               isOpen={isSearchPopoverOpen}
               onOpenChange={handleSearchPopoverChange}
+              // ********** REFACTOR THIS FUNCTION **********
+              // TODO - REFACTOR - THIS SHOULD NOT BE NECESSARY, CHANGED IN NEXTUI 2.4.1 FROM 2.2.9
+              // USED TO MAKE SURE THAT SEARCH IS INTERACTABLE OUTSIDE OF THE POPUP
+              // ********** REFACTOR THIS FUNCTION **********
+              shouldCloseOnInteractOutside={() => {
+                return true;
+              }}
             >
               <PopoverTrigger>
                 <Button variant="ghost" radius="full" isIconOnly>

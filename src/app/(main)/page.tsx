@@ -1,19 +1,33 @@
 import Link from 'next/link';
 
+import { Avatar } from '@nextui-org/react';
 import FilmBackdrop from '@/components/film/FilmBackdrop';
 
 import { getTrendingMovies } from '@/lib/film';
+import { getRandomUsers } from '@/lib/users';
 
 export default async function HomePage() {
   const trendingMovies = await getTrendingMovies('week');
   const randomMovie =
     trendingMovies[Math.floor(Math.random() * trendingMovies.length)];
 
+  const randomUsers = await getRandomUsers(6);
+
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
-          <div className="px-4 md:px-6">
+        <section className="relative w-full py-12 md:py-24 lg:py-32 xl:py-48">
+          <div className="absolute inset-0">
+            <div
+              className="w-full h-full bg-cover bg-center filter blur-3xl opacity-35 dark:opacity-25"
+              style={{
+                backgroundImage: `url("${randomMovie.backdrop}")`,
+                transform: 'scale(-1.25, -1.25)',
+              }}
+            />
+          </div>
+
+          <div className="relative px-4 md:px-6">
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
@@ -44,7 +58,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+        <section className="relative w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
           <div className="px-4 md:px-6">
             <div className="grid items-center gap-6 lg:grid-cols-[1fr_500px] lg:gap-12 xl:grid-cols-[1fr_550px]">
               <div className="space-y-2">
@@ -65,7 +79,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 lg:py-32">
+        <section className="relative w-full py-12 md:py-24 lg:py-32">
           <div className="grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
@@ -78,47 +92,22 @@ export default async function HomePage() {
                 favorite show or film.
               </p>
             </div>
-            <div className="grid w-full grid-cols-2 lg:grid-cols-5 items-center justify-center gap-8 lg:gap-12 [&>img]:mx-auto">
-              <img
-                alt="Community Member"
-                className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
-                height="70"
-                src="/placeholder.svg"
-                width="140"
-              />
-              <img
-                alt="Community Member"
-                className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
-                height="70"
-                src="/placeholder.svg"
-                width="140"
-              />
-              <img
-                alt="Community Member"
-                className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
-                height="70"
-                src="/placeholder.svg"
-                width="140"
-              />
-              <img
-                alt="Community Member"
-                className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
-                height="70"
-                src="/placeholder.svg"
-                width="140"
-              />
-              <img
-                alt="Community Member"
-                className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
-                height="70"
-                src="/placeholder.svg"
-                width="140"
-              />
+            <div className="grid w-full grid-cols-2 lg:grid-cols-6 items-center justify-center gap-8 lg:gap-12 [&>img]:mx-auto">
+              {randomUsers.map((user) => (
+                <Link
+                  key={user.id}
+                  href={'/profile/' + user.username}
+                  className="flex flex-col items-center gap-2 hover:scale-105 active:scale-90 transition-all"
+                >
+                  <Avatar src={user.avatar} size="lg"></Avatar>
+                  <p className="text-sm font-medium">{user.username}</p>
+                </Link>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 lg:py-32 border-t">
+        <section className="relative w-full py-12 md:py-24 lg:py-32 border-t">
           <div className="grid items-center justify-center gap-4 px-4 md:px-6 text-center">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">

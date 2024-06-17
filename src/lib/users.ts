@@ -246,3 +246,28 @@ export async function getFollowerCount(userId: string) {
 
   return count;
 }
+
+// TODO - Check performance of this, consider getting user data in one query
+export async function getRandomUsers(count: number) {
+  const supabase = getServer(cookies());
+
+  const { data: dataIds, error } = await supabase
+    .from('users')
+    .select('id')
+    // TODO - Fix random ordering
+    // .order('random()')
+    .limit(count);
+
+  if (error) {
+    console.error('Error getting random users', error);
+    throw error;
+  }
+
+  const data = [];
+  for (const userId of dataIds) {
+    const user = await getUser(userId.id);
+    data.push(user);
+  }
+
+  return data;
+}

@@ -33,7 +33,7 @@ export default function Search({
       size="lg"
       label={'Search for a ' + type}
       menuTrigger="input"
-      defaultItems={searchResults || []}
+      items={searchResults || []}
       isLoading={searchResultsIsLoading}
       onInputChange={(searchInput) => {
         if (

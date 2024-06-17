@@ -4,6 +4,23 @@ import { cookies } from 'next/headers';
 import { getServer } from '@/lib/supabase';
 import { UserDB, User } from '@/lib/types';
 
+export async function getAuthedUser() {
+  const supabase = getServer(cookies());
+
+  const { data: userData, error } = await supabase.auth.getUser();
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+
+  if (!userData) {
+    return null;
+  }
+
+  return userData.user;
+}
+
 export async function createUser(user: UserDB) {
   const supabase = getServer(cookies());
 
@@ -245,6 +262,24 @@ export async function getFollowerCount(userId: string) {
   }
 
   return count;
+}
+
+export async function didUserLikeMovieReview(userId: string, reviewId: string) {
+  const supabase = getServer(cookies());
+
+  const { data, error } = await supabase
+    .from('reviews_movies_likes')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('review_id', reviewId)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error checking if user liked review', error);
+    throw error;
+  }
+
+  return data !== null;
 }
 
 // TODO - Check performance of this, consider getting user data in one query

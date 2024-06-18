@@ -135,98 +135,88 @@ export default function ProfilePage({
     return (
       <div className="grid grid-cols-4 gap-4 p-8">
         <div className="flex flex-col items-center gap-4">
-          <Skeleton
-            isLoaded={!userDataIsLoading}
-            className="w-[100px] h-[100px] md:w-[200px] md:h-[200px] lg:w-[250px] lg:h-[250px] rounded-full shadow-md shadow-black"
-          >
-            <Image
-              src={userData.avatar}
-              alt={'Profile picture for ' + userData.username}
-              isBlurred
-              className="w-full object-cover"
-            />
-          </Skeleton>
+          <Avatar
+            isBordered
+            src={userData.avatar}
+            name={userData.initials}
+            showFallback
+            className="w-[100px] h-[100px] md:w-[200px] md:h-[200px] lg:w-[250px] lg:h-[250px] text-7xl"
+          />
 
-          <Skeleton isLoaded={!userDataIsLoading}>
-            <div className="text-center">
-              <h1 className="text-3xl font-bold">
-                {userData.first_name} {userData.last_name}
-              </h1>
-              <div className="flex justify-center items-center gap-3">
-                <p className="text-default-500 leading-tight">
-                  @{userData.username}
-                </p>
-                {isUserFollowingAuth && (
-                  <Chip size="sm" variant="flat">
-                    Follows You
-                  </Chip>
-                )}
-              </div>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold">
+              {userData.first_name} {userData.last_name}
+            </h1>
+            <div className="flex justify-center items-center gap-3">
+              <p className="text-default-500 leading-tight">
+                @{userData.username}
+              </p>
+              {isUserFollowingAuth && (
+                <Chip size="sm" variant="flat">
+                  Follows You
+                </Chip>
+              )}
             </div>
-          </Skeleton>
+          </div>
 
-          <Skeleton isLoaded={!userDataIsLoading}>
-            <div className="flex gap-2">
+          <div className="flex gap-2">
+            <Button
+              variant="light"
+              size="sm"
+              onPress={() => setFollowersModalOpen(!followersModalOpen)}
+            >
+              {truncateNumber(userData.follower_count) + ' Followers'}
+            </Button>
+            <Button
+              variant="light"
+              size="sm"
+              onPress={() => setFollowingModalOpen(!followingModalOpen)}
+            >
+              {truncateNumber(userData.following_count) + ' Following'}
+            </Button>
+          </div>
+
+          {authUserData && userData.id === authUserData.id ? (
+            <>
               <Button
-                variant="light"
                 size="sm"
-                onPress={() => setFollowersModalOpen(!followersModalOpen)}
+                onPress={() => setEditProfileModalOpen(!editProfileModalOpen)}
+                className="w-full"
               >
-                {truncateNumber(userData.follower_count) + ' Followers'}
+                Edit Profile
               </Button>
+            </>
+          ) : (
+            authUserData && (
               <Button
-                variant="light"
                 size="sm"
-                onPress={() => setFollowingModalOpen(!followingModalOpen)}
-              >
-                {truncateNumber(userData.following_count) + ' Following'}
-              </Button>
-            </div>
-          </Skeleton>
+                onPress={() => {
+                  if (authUserData) {
+                    if (isAuthFollowingUser) {
+                      unfollowUser(authUserData.id, userData.id);
 
-          <Skeleton isLoaded={!userDataIsLoading}>
-            {authUserData && userData.id === authUserData.id ? (
-              <>
-                <Button
-                  size="sm"
-                  onPress={() => setEditProfileModalOpen(!editProfileModalOpen)}
-                  className="w-full"
-                >
-                  Edit Profile
-                </Button>
-              </>
-            ) : (
-              authUserData && (
-                <Button
-                  size="sm"
-                  onPress={() => {
-                    if (authUserData) {
-                      if (isAuthFollowingUser) {
-                        unfollowUser(authUserData.id, userData.id);
+                      mutateAuthFollowingUser(false); // update follow state client side
+                      mutateUser({
+                        ...userData,
+                        follower_count: userData.follower_count - 1, // update follower count client side
+                      });
+                    } else {
+                      followUser(authUserData.id, userData.id);
 
-                        mutateAuthFollowingUser(false); // update follow state client side
-                        mutateUser({
-                          ...userData,
-                          follower_count: userData.follower_count - 1, // update follower count client side
-                        });
-                      } else {
-                        followUser(authUserData.id, userData.id);
-
-                        mutateAuthFollowingUser(true); // update follow state client side
-                        mutateUser({
-                          ...userData,
-                          follower_count: userData.follower_count + 1, // update follower count client side
-                        });
-                      }
+                      mutateAuthFollowingUser(true); // update follow state client side
+                      mutateUser({
+                        ...userData,
+                        follower_count: userData.follower_count + 1, // update follower count client side
+                      });
                     }
-                  }}
-                  className="w-full"
-                >
-                  {isAuthFollowingUser ? 'Unfollow' : 'Follow'}
-                </Button>
-              )
-            )}
-          </Skeleton>
+                  }
+                }}
+                className="w-full"
+              >
+                {isAuthFollowingUser ? 'Unfollow' : 'Follow'}
+              </Button>
+            )
+          )}
         </div>
 
         <UserListModal
@@ -548,11 +538,12 @@ function EditProfileModal({
                       className="rounded-full"
                     >
                       <Avatar
-                        size="lg"
-                        name={`${firstName?.charAt(0)}${lastName?.charAt(0)}`}
-                        src={avatar ? avatar : authUserData.avatar}
-                        isIconOnly
                         as={Button}
+                        isIconOnly
+                        size="lg"
+                        src={avatar ? avatar : authUserData.avatar}
+                        name={authUserData.initials}
+                        showFallback
                         onPress={() => {
                           uploadRef.current?.click();
                         }}

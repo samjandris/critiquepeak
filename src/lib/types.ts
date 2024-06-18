@@ -8,6 +8,7 @@ export interface UserDB {
 
 export interface User extends UserDB {
   avatar: string;
+  initials: string;
   following_count: number;
   follower_count: number;
 }

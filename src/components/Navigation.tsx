@@ -226,10 +226,12 @@ export default function Navigation() {
               <DropdownTrigger>
                 {user ? (
                   <Avatar
-                    isBordered
                     as="button"
+                    isBordered
                     size="sm"
                     src={userData?.avatar}
+                    name={userData?.initials}
+                    showFallback
                     className="ml-1 transition-transform"
                   />
                 ) : (

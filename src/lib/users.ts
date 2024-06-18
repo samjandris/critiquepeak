@@ -2,23 +2,26 @@
 
 import { cookies } from 'next/headers';
 import { getServer } from '@/lib/supabase';
+import { getInitials } from '@/lib/misc';
 import { UserDB, User } from '@/lib/types';
 
-export async function getAuthedUser() {
+export async function getAuthedUser(): Promise<User | null> {
   const supabase = getServer(cookies());
 
-  const { data: userData, error } = await supabase.auth.getUser();
+  const { data: authUserData, error } = await supabase.auth.getUser();
 
   if (error) {
     console.error(error);
     throw error;
   }
 
-  if (!userData) {
+  if (!authUserData) {
     return null;
   }
 
-  return userData.user;
+  const user = await getUser(authUserData.user.id);
+
+  return user;
 }
 
 export async function createUser(user: UserDB) {
@@ -65,29 +68,22 @@ export async function getUser(id: string): Promise<User> {
 
   const user = data ? data[0] : null;
 
-  try {
-    const { data: avatarData } = await supabase.storage
-      .from('avatars')
-      .getPublicUrl(`${id}/profile.png`);
-
-    user.avatar = avatarData.publicUrl;
-
-    const response = await fetch(user.avatar, {
-      method: 'HEAD',
-    });
-
-    if (!response.ok) {
-      user.avatar =
-        'https://ui-avatars.com/api/?size=512&format=png&name=' +
-        encodeURIComponent(`${user.first_name} ${user.last_name}`); // UI Avatars
-      // user.avatar = 'https://source.boringavatars.com/beam/' + encodeURIComponent(user.id); // Boring Avatars
-    }
-
-    user.following_count = await getFollowingCount(id);
-    user.follower_count = await getFollowerCount(id);
-  } catch (error) {}
+  user.avatar = await getUserAvatar(id);
+  user.initials = getInitials(user.first_name, user.last_name);
+  user.following_count = await getFollowingCount(id);
+  user.follower_count = await getFollowerCount(id);
 
   return user;
+}
+
+export async function getUserAvatar(id: string): Promise<string> {
+  const supabase = getServer(cookies());
+
+  const { data: avatarData } = await supabase.storage
+    .from('avatars')
+    .getPublicUrl(`${id}/profile.png`);
+
+  return avatarData.publicUrl;
 }
 
 export async function updateUser(
@@ -152,7 +148,10 @@ export async function unfollowUser(userId: string, toUnfollow: string) {
   return;
 }
 
-export async function isUserFollowing(userId: string, toCheck: string) {
+export async function isUserFollowing(
+  userId: string,
+  toCheck: string
+): Promise<boolean> {
   const supabase = getServer(cookies());
 
   const { data, error } = await supabase
@@ -186,7 +185,7 @@ export async function getFollowing(userId: string) {
   return data.map((follow) => follow.following_id);
 }
 
-export async function getFollowingIds(userId: string) {
+export async function getFollowingIds(userId: string): Promise<string[]> {
   const supabase = getServer(cookies());
 
   const { data, error } = await supabase
@@ -202,7 +201,7 @@ export async function getFollowingIds(userId: string) {
   return data.map((follow) => follow.following_id);
 }
 
-export async function getFollowingCount(userId: string) {
+export async function getFollowingCount(userId: string): Promise<number> {
   const supabase = getServer(cookies());
 
   const { count, error } = await supabase
@@ -214,7 +213,7 @@ export async function getFollowingCount(userId: string) {
     console.error('Error getting follower count', error);
   }
 
-  return count;
+  return count || 0;
 }
 
 export async function getFollowers(userId: string) {
@@ -233,7 +232,7 @@ export async function getFollowers(userId: string) {
   return data.map((follow) => follow.follower_id);
 }
 
-export async function getFollowerIds(userId: string) {
+export async function getFollowerIds(userId: string): Promise<string[]> {
   const supabase = getServer(cookies());
 
   const { data, error } = await supabase
@@ -249,7 +248,7 @@ export async function getFollowerIds(userId: string) {
   return data.map((follow) => follow.follower_id);
 }
 
-export async function getFollowerCount(userId: string) {
+export async function getFollowerCount(userId: string): Promise<number> {
   const supabase = getServer(cookies());
 
   const { count, error } = await supabase
@@ -261,10 +260,13 @@ export async function getFollowerCount(userId: string) {
     console.error('Error getting follower count', error);
   }
 
-  return count;
+  return count || 0;
 }
 
-export async function didUserLikeMovieReview(userId: string, reviewId: string) {
+export async function didUserLikeMovieReview(
+  userId: string,
+  reviewId: string
+): Promise<boolean> {
   const supabase = getServer(cookies());
 
   const { data, error } = await supabase
@@ -282,13 +284,12 @@ export async function didUserLikeMovieReview(userId: string, reviewId: string) {
   return data !== null;
 }
 
-// TODO - Check performance of this, consider getting user data in one query
-export async function getRandomUsers(count: number) {
+export async function getRandomUsers(count: number): Promise<User[]> {
   const supabase = getServer(cookies());
 
-  const { data: dataIds, error } = await supabase
+  const { data, error } = await supabase
     .from('users')
-    .select('id')
+    .select('*')
     // TODO - Fix random ordering
     // .order('random()')
     .limit(count);
@@ -298,10 +299,9 @@ export async function getRandomUsers(count: number) {
     throw error;
   }
 
-  const data = [];
-  for (const userId of dataIds) {
-    const user = await getUser(userId.id);
-    data.push(user);
+  for (const user of data) {
+    user.avatar = await getUserAvatar(user.id);
+    user.initials = getInitials(user.first_name, user.last_name);
   }
 
   return data;

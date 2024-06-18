@@ -58,7 +58,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="relative w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+        <section className="relative w-full py-12 md:py-24 lg:py-32 bg-white dark:bg-black">
           <div className="px-4 md:px-6">
             <div className="grid items-center gap-6 lg:grid-cols-[1fr_500px] lg:gap-12 xl:grid-cols-[1fr_550px]">
               <div className="space-y-2">
@@ -79,7 +79,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="relative w-full py-12 md:py-24 lg:py-32">
+        <section className="relative w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
           <div className="grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
@@ -99,7 +99,12 @@ export default async function HomePage() {
                   href={'/profile/' + user.username}
                   className="flex flex-col items-center gap-2 hover:scale-105 active:scale-90 transition-all"
                 >
-                  <Avatar src={user.avatar} size="lg"></Avatar>
+                  <Avatar
+                    src={user.avatar}
+                    name={user.initials}
+                    showFallback
+                    size="lg"
+                  />
                   <p className="text-sm font-medium">{user.username}</p>
                 </Link>
               ))}
@@ -107,7 +112,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="relative w-full py-12 md:py-24 lg:py-32 border-t">
+        <section className="relative w-full py-12 md:py-24 lg:py-32">
           <div className="grid items-center justify-center gap-4 px-4 md:px-6 text-center">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">

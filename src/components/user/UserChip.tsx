@@ -41,7 +41,14 @@ export default function UserChip({ userId }: { userId: string }) {
         data-loading={userDataIsLoading}
         className="flex gap-3 w-full data-[loading=true]:pointer-events-none"
       >
-        <Avatar isBordered radius="full" size="md" src={userData?.avatar} />
+        <Avatar
+          isBordered
+          radius="full"
+          size="md"
+          src={userData?.avatar}
+          name={userData?.initials}
+          showFallback
+        />
         <div className="flex flex-col gap-0.5 items-start justify-center">
           <Skeleton
             isLoaded={!userDataIsLoading}

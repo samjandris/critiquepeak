@@ -50,3 +50,14 @@ export function getOrdinalDate(date: Date) {
 
   return `${month} ${ordinal(day)}, ${year}`;
 }
+
+export function getInitials(firstName: string, lastName: string): string {
+  return firstName.charAt(0) + lastName.charAt(0);
+}
+
+export function getFallbackAvatar(firstName: string, lastName: string): string {
+  return (
+    'https://ui-avatars.com/api/?size=512&format=png&name=' +
+    encodeURIComponent(`${firstName} ${lastName}`) // UI Avatars
+  );
+}

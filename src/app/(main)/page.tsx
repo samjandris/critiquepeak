@@ -17,7 +17,7 @@ export default async function HomePage() {
     <div className="flex flex-col min-h-[100dvh]">
       <main className="flex-1">
         <section className="relative w-full py-12 md:py-24 lg:py-32 xl:py-48">
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 overflow-hidden">
             <div
               className="w-full h-full bg-cover bg-center filter blur-3xl opacity-35 dark:opacity-25"
               style={{

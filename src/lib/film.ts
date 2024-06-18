@@ -1,6 +1,6 @@
 'use server';
 
-import { Film } from '@/lib/types';
+import { Film, CastPerson, CrewPerson } from '@/lib/types';
 
 const movieDbApiKey = process.env.TMDB_API_KEY;
 const movieDbHeaders = {
@@ -11,6 +11,7 @@ const movieDbHeaders = {
 const defaults = {
   posterSize: 'w780',
   backdropSize: 'w1280',
+  profileSize: 'h632',
 };
 
 let config = {
@@ -195,6 +196,100 @@ export async function searchMovies(
 ): Promise<Film[]> {
   const response = await fetch(
     `https://api.themoviedb.org/3/search/movie?api_key=${movieDbApiKey}&query=${searchTerm}`,
+    {
+      next: {
+        revalidate: 3600,
+      },
+    }
+  );
+
+  const tmdbJson = await response.json();
+  const tmdbData = tmdbJson.results;
+
+  return tmdbData.map((movie: any) => {
+    return {
+      id: movie.id,
+      title: movie.title,
+      overview: movie.overview,
+      poster: `${config.images.secure_base_url}${posterSize}${movie.poster_path}`,
+      backdrop: `${config.images.secure_base_url}${backdropSize}${movie.backdrop_path}`,
+      releaseDate: new Date(movie.release_date),
+      averageRating: movie.vote_average / 2,
+    };
+  });
+}
+
+export async function getMovieCast(
+  movieId: string,
+  { profileSize = defaults.profileSize } = {}
+): Promise<CastPerson[]> {
+  const response = await fetch(
+    `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${movieDbApiKey}`,
+    {
+      next: {
+        revalidate: 3600,
+      },
+    }
+  );
+
+  const tmdbData = await response.json();
+
+  let cast: CastPerson[] = [];
+  for (const person of tmdbData.cast) {
+    cast.push({
+      id: person.id,
+      name: person.name,
+      character: person.character,
+      avatar: `${config.images.secure_base_url}${profileSize}${person.profile_path}`,
+    });
+  }
+
+  return cast;
+}
+
+export async function getMovieCrew(
+  movieId: string,
+  { profileSize = defaults.profileSize } = {}
+): Promise<CrewPerson[]> {
+  const response = await fetch(
+    `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${movieDbApiKey}`,
+    {
+      next: {
+        revalidate: 3600,
+      },
+    }
+  );
+
+  const tmdbData = await response.json();
+
+  let crew: CrewPerson[] = [];
+  for (const person of tmdbData.crew) {
+    const existingPerson = crew.find((p) => p.id === person.id);
+
+    if (existingPerson) {
+      existingPerson.job += ` / ${person.job}`;
+    } else {
+      crew.push({
+        id: person.id,
+        name: person.name,
+        job: person.job,
+        avatar: `${config.images.secure_base_url}${profileSize}${person.profile_path}`,
+      });
+    }
+  }
+
+  return crew;
+}
+
+export async function getRecommendedMovies(
+  movieId: string,
+  {
+    posterSize = defaults.posterSize,
+    backdropSize = defaults.backdropSize,
+  } = {}
+) {
+  const response = await fetch(
+    `https://api.themoviedb.org/3/movie/${movieId}/recommendations?api_key=${movieDbApiKey}`,
     {
       next: {
         revalidate: 3600,

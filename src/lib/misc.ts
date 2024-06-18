@@ -51,7 +51,17 @@ export function getOrdinalDate(date: Date) {
   return `${month} ${ordinal(day)}, ${year}`;
 }
 
-export function getInitials(firstName: string, lastName: string): string {
+export function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map((n) => n.charAt(0))
+    .join('');
+}
+
+export function getInitialsFirstLast(
+  firstName: string,
+  lastName: string
+): string {
   return firstName.charAt(0) + lastName.charAt(0);
 }
 

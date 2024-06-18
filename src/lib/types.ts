@@ -46,3 +46,17 @@ export interface SeasonReview extends SeriesReview {
   series: string;
   season: number;
 }
+
+export interface Person {
+  id: string;
+  name: string;
+  avatar: string;
+}
+
+export interface CastPerson extends Person {
+  character: string;
+}
+
+export interface CrewPerson extends Person {
+  job: string;
+}

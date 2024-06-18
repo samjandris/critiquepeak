@@ -1,6 +1,7 @@
-import { Image, Chip } from '@nextui-org/react';
+import { Image, Chip, cn } from '@nextui-org/react';
 import { StarRatingPrecise } from '@/components/StarRating';
 import UserReview from '@/components/user/UserReview';
+import CastCrew from '@/components/cast/CastCrew';
 
 import {
   CalendarFillIcon,
@@ -8,9 +9,15 @@ import {
   DollarCircleIcon,
 } from '@/components/Icons';
 
-import { getMovie } from '@/lib/film';
+import {
+  getMovie,
+  getMovieCast,
+  getMovieCrew,
+  getRecommendedMovies,
+} from '@/lib/film';
 import { getRecentReviews } from '@/lib/reviews';
 import { truncateNumber, getOrdinalDate } from '@/lib/misc';
+import FilmCarousel from '@/components/film/FilmCarousel';
 
 export default async function FilmDetails({
   params,
@@ -23,9 +30,16 @@ export default async function FilmDetails({
   });
   const recentReviews = await getRecentReviews(Number(params.filmId));
 
+  const cast = await getMovieCast(params.filmId);
+  const crew = await getMovieCrew(params.filmId);
+
+  const recommendedMovies = await getRecommendedMovies(params.filmId);
+
+  const bgSwap = recentReviews.length > 0;
+
   return (
-    <div className="flex flex-col gap-8 p-8">
-      <div className="grid grid-cols-4 gap-5">
+    <div className="flex flex-col gap-8 pt-8">
+      <section className="grid grid-cols-4 gap-5 px-8">
         <Image
           src={filmDetails.poster}
           alt={'Poster for the film ' + filmDetails.title}
@@ -84,11 +98,16 @@ export default async function FilmDetails({
             className="w-[65%] h-auto"
           />
         </div>
-      </div>
+      </section>
 
-      <div className="flex flex-col items-center gap-4">
+      <section
+        className={cn(
+          'flex flex-col items-center gap-4 p-4',
+          bgSwap && 'bg-gray-100 dark:bg-gray-900'
+        )}
+      >
         {recentReviews.length === 0 ? (
-          <p className="text-default-500">No reviews yet</p>
+          <p className="text-default-500 text-xl">No reviews yet</p>
         ) : (
           <>
             <h4>Recent reviews</h4>
@@ -104,7 +123,32 @@ export default async function FilmDetails({
             </div>
           </>
         )}
-      </div>
+      </section>
+
+      <section
+        className={cn(
+          'flex flex-col items-center py-4 px-8',
+          !bgSwap && 'bg-gray-100 dark:bg-gray-900'
+        )}
+      >
+        <div className="w-[82%] md:w-[90%]">
+          <CastCrew cast={cast} crew={crew} />
+        </div>
+      </section>
+
+      {recommendedMovies.length > 0 && (
+        <section
+          className={cn(
+            'flex flex-col items-center gap-4 py-4 px-8',
+            bgSwap && 'bg-gray-100 dark:bg-gray-900'
+          )}
+        >
+          <h4>People also watched</h4>
+          <div className="w-[95%]">
+            <FilmCarousel films={recommendedMovies} />
+          </div>
+        </section>
+      )}
     </div>
   );
 }

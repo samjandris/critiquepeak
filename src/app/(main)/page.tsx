@@ -100,10 +100,11 @@ export default async function HomePage() {
                   className="flex flex-col items-center gap-2 hover:scale-105 active:scale-90 transition-all"
                 >
                   <Avatar
+                    isBordered
                     src={user.avatar}
                     name={user.initials}
                     showFallback
-                    size="lg"
+                    className="w-24 h-24"
                   />
                   <p className="text-sm font-medium">{user.username}</p>
                 </Link>

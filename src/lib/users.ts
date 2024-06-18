@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { getServer } from '@/lib/supabase';
-import { getInitials } from '@/lib/misc';
+import { getInitialsFirstLast } from '@/lib/misc';
 import { UserDB, User } from '@/lib/types';
 
 export async function getAuthedUser(): Promise<User | null> {
@@ -69,7 +69,7 @@ export async function getUser(id: string): Promise<User> {
   const user = data ? data[0] : null;
 
   user.avatar = await getUserAvatar(id);
-  user.initials = getInitials(user.first_name, user.last_name);
+  user.initials = getInitialsFirstLast(user.first_name, user.last_name);
   user.following_count = await getFollowingCount(id);
   user.follower_count = await getFollowerCount(id);
 
@@ -301,7 +301,7 @@ export async function getRandomUsers(count: number): Promise<User[]> {
 
   for (const user of data) {
     user.avatar = await getUserAvatar(user.id);
-    user.initials = getInitials(user.first_name, user.last_name);
+    user.initials = getInitialsFirstLast(user.first_name, user.last_name);
   }
 
   return data;

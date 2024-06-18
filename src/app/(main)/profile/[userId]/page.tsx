@@ -539,6 +539,7 @@ function EditProfileModal({
                     >
                       <Avatar
                         as={Button}
+                        isBordered
                         isIconOnly
                         size="lg"
                         src={avatar ? avatar : authUserData.avatar}

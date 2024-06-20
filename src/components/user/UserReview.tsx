@@ -11,6 +11,7 @@ import {
   Chip,
   Skeleton,
   ScrollShadow,
+  Button,
   cn,
 } from '@nextui-org/react';
 import UserChip from '@/components/user/UserChip';
@@ -86,13 +87,11 @@ export default function UserReview({
       <CardHeader>
         <UserChip userId={review.user_id} />
       </CardHeader>
-      <CardBody className="px-3 py-0 text-small text-default-400">
+      <CardBody className="px-3 py-0 text-small text-text">
         <div className="flex gap-2 mb-3">
           {!hideType && <Chip size="sm">{'Film'}</Chip>}
           <StarRating rating={review.rating} />
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {review.rating.toFixed(1)}
-          </p>
+          <p className="text-sm text-text-700">{review.rating.toFixed(1)}</p>
         </div>
         <div className="flex gap-3 pb-1">
           {!hidePoster && (
@@ -106,7 +105,7 @@ export default function UserReview({
             </div>
           )}
           <ScrollShadow className="max-h-[175px]">
-            <p className="leading-normal text-default-700">{review.review}</p>
+            <p className="leading-normal text-text">{review.review}</p>
           </ScrollShadow>
         </div>
       </CardBody>
@@ -170,7 +169,7 @@ export default function UserReview({
             />
           </div>
 
-          <p className="font-semibold text-default-400 text-small">
+          <p className="font-semibold text-text text-small">
             {!authUserDataIsLoading &&
             !userDidLikeIsLoading &&
             !reviewLikesIsLoading
@@ -186,12 +185,14 @@ export default function UserReview({
         </Button> */}
 
         <div>
-          <Link
+          <Button
+            as={Link}
             href={`/review/${review.id}`}
-            className="flex h-6 items-center justify-center rounded-full px-3 text-sm font-medium bg-gray-900 dark:bg-gray-50 text-gray-50 dark:text-gray-900 hover:bg-gray-900/90 dark:hover:bg-gray-50/90 hover:ring-1 hover:ring-gray-950 dark:hover:ring-gray-300 transition-colors"
+            size="sm"
+            radius="full"
           >
             Read
-          </Link>
+          </Button>
         </div>
       </CardFooter>
     </Card>

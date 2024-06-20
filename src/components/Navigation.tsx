@@ -115,7 +115,7 @@ export default function Navigation() {
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
                   <Button
-                    variant="ghost"
+                    variant="solid"
                     radius="full"
                     startContent={<PlusIcon />}
                   >
@@ -164,7 +164,7 @@ export default function Navigation() {
               }}
             >
               <PopoverTrigger>
-                <Button variant="ghost" radius="full" isIconOnly>
+                <Button variant="solid" radius="full" isIconOnly>
                   <SearchIcon />
                 </Button>
               </PopoverTrigger>
@@ -235,7 +235,7 @@ export default function Navigation() {
                     className="ml-1 transition-transform"
                   />
                 ) : (
-                  <Button variant="ghost" radius="full" isIconOnly>
+                  <Button variant="solid" radius="full" isIconOnly>
                     <GearFillIcon
                       data-open={isUserDropdownOpen}
                       className="transition-all rotate-0 data-[open=true]:rotate-45"

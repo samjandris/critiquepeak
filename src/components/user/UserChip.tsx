@@ -54,7 +54,7 @@ export default function UserChip({ userId }: { userId: string }) {
             isLoaded={!userDataIsLoading}
             className="rounded-lg data-[loaded]:rounded-none"
           >
-            <p className="text-small font-semibold leading-tight text-default-800">
+            <p className="text-small font-semibold leading-tight text-text">
               {userData
                 ? `${userData.first_name} ${userData.last_name}`
                 : '--------------------'}
@@ -64,7 +64,7 @@ export default function UserChip({ userId }: { userId: string }) {
             isLoaded={!userDataIsLoading}
             className="rounded-lg data-[loaded]:rounded-none"
           >
-            <p className="text-small tracking-tight leading-tight text-default-400">
+            <p className="text-small tracking-tight leading-tight text-text-500">
               @{userData ? userData.username : '------------'}
             </p>
           </Skeleton>
@@ -84,12 +84,7 @@ export default function UserChip({ userId }: { userId: string }) {
               userData.id === authUser!.id) ||
             false
           }
-          className={
-            isAuthFollowingUser
-              ? 'bg-transparent text-foreground border-default-200'
-              : ''
-          }
-          color="primary"
+          color={isAuthFollowingUser ? 'default' : 'primary'}
           radius="full"
           size="sm"
           variant={
@@ -97,10 +92,10 @@ export default function UserChip({ userId }: { userId: string }) {
             !authUserDataIsLoading &&
             !authFollowingUserIsLoading
               ? userData && authUser && userData.id === authUser!.id
-                ? 'flat'
+                ? 'shadow'
                 : isAuthFollowingUser
-                ? 'bordered'
-                : 'solid'
+                ? 'solid'
+                : 'shadow'
               : 'flat'
           }
           onPress={() => {

@@ -57,7 +57,7 @@ export default function FilmCarousel({ films }: { films: Film[] }) {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <div className="py-2 text-center text-sm text-default-400">
+      <div className="py-2 text-center text-sm text-inherit">
         Page {current} of {count}
       </div>
       <CarouselPrevious />

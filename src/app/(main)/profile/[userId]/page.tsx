@@ -148,7 +148,7 @@ export default function ProfilePage({
               {userData.first_name} {userData.last_name}
             </h1>
             <div className="flex justify-center items-center gap-3">
-              <p className="text-default-500 leading-tight">
+              <p className="text-text-600 leading-tight">
                 @{userData.username}
               </p>
               {isUserFollowingAuth && (

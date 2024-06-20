@@ -14,7 +14,7 @@ export interface User extends UserDB {
 }
 
 export interface Film {
-  id: number;
+  id: string;
   title: string;
   overview: string;
   poster: string;
@@ -58,5 +58,6 @@ export interface CastPerson extends Person {
 }
 
 export interface CrewPerson extends Person {
+  department: string;
   job: string;
 }

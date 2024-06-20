@@ -1,19 +1,39 @@
+html {
+  font-size: 100%;
+}
+
+body {
+  font-weight: 400;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-weight: 700;
+}
+
 h1 {
-  @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+  font-size: 4.21rem;
 }
 
 h2 {
-  @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0;
+  font-size: 3.158rem;
 }
 
 h3 {
-  @apply scroll-m-20 text-2xl font-semibold tracking-tight;
+  font-size: 2.369rem;
 }
 
 h4 {
-  @apply scroll-m-20 text-xl font-semibold tracking-tight;
+  font-size: 1.777rem;
 }
 
-p {
-  @apply leading-7;
+h5 {
+  font-size: 1.333rem;
+}
+
+small {
+  font-size: 0.75rem;
 }

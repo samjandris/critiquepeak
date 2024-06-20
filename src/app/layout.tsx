@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import LocalFont from 'next/font/local';
 import { AuthProvider } from '@/components/AuthProvider';
 import { UIProvider } from '@/components/UIProvider';
 
@@ -7,6 +8,9 @@ import '@/styles/globals.css';
 import '@/styles/typography.css';
 
 const inter = Inter({ subsets: ['latin'] });
+const ubuntuSans = LocalFont({
+  src: [{ path: '../styles/fonts/UbuntuSans-Regular.ttf' }],
+});
 
 export const metadata: Metadata = {
   title: '404 - Page Not Found',
@@ -20,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={ubuntuSans.className}>
         <AuthProvider>
           <UIProvider>
             <div className="flex justify-center">

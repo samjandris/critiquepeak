@@ -7,7 +7,7 @@ import { FilmReview } from '@/lib/types';
 import { getAuthedUser } from '@/lib/users';
 
 export async function createMovieReview(
-  filmId: number,
+  filmId: string,
   rating: number,
   review?: string,
   isRewatch = false
@@ -47,7 +47,7 @@ export async function getRecentMovieReviews(): Promise<FilmReview[]> {
   return data;
 }
 
-export async function getRecentReviews(filmId: number): Promise<FilmReview[]> {
+export async function getRecentReviews(filmId: string): Promise<FilmReview[]> {
   const supabase = getServer(cookies());
 
   const { data, error } = await supabase

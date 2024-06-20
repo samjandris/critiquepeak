@@ -239,8 +239,8 @@ export async function getMovieCast(
     cast.push({
       id: person.id,
       name: person.name,
-      character: person.character,
       avatar: `${config.images.secure_base_url}${profileSize}${person.profile_path}`,
+      character: person.character,
     });
   }
 
@@ -264,18 +264,13 @@ export async function getMovieCrew(
 
   let crew: CrewPerson[] = [];
   for (const person of tmdbData.crew) {
-    const existingPerson = crew.find((p) => p.id === person.id);
-
-    if (existingPerson) {
-      existingPerson.job += ` / ${person.job}`;
-    } else {
-      crew.push({
-        id: person.id,
-        name: person.name,
-        job: person.job,
-        avatar: `${config.images.secure_base_url}${profileSize}${person.profile_path}`,
-      });
-    }
+    crew.push({
+      id: person.id,
+      name: person.name,
+      avatar: `${config.images.secure_base_url}${profileSize}${person.profile_path}`,
+      department: person.department,
+      job: person.job,
+    });
   }
 
   return crew;

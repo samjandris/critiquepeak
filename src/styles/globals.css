@@ -1,3 +1,63 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --text: #13120d;
+    --accent: #cfccbb;
+
+    --text-50: #f5f4f0;
+    --text-100: #eae9e1;
+    --text-200: #d6d2c2;
+    --text-300: #c1bca4;
+    --text-400: #aca686;
+    --text-500: #989067;
+    --text-600: #797353;
+    --text-700: #5b563e;
+    --text-800: #3d3929;
+    --text-900: #1e1d15;
+    --text-950: #0f0e0a;
+
+    --accent-50: #f4f4f0;
+    --accent-100: #eae9e1;
+    --accent-200: #d5d2c3;
+    --accent-300: #c0bca5;
+    --accent-400: #aaa588;
+    --accent-500: #958f6a;
+    --accent-600: #777255;
+    --accent-700: #5a563f;
+    --accent-800: #3c392a;
+    --accent-900: #1e1d15;
+    --accent-950: #0f0e0b;
+  }
+
+  .dark {
+    --text: #e2ebcd;
+    --accent: #283029;
+
+    --text-50: #0d0e0c;
+    --text-100: #1a1b18;
+    --text-200: #343630;
+    --text-300: #4e5148;
+    --text-400: #686c60;
+    --text-500: #828778;
+    --text-600: #9b9f93;
+    --text-700: #b4b7ae;
+    --text-800: #cdcfc9;
+    --text-900: #e6e7e4;
+    --text-950: #f4f8ed;
+
+    --accent-50: #171c18;
+    --accent-100: #2e3830;
+    --accent-200: #465347;
+    --accent-300: #5d6f5f;
+    --accent-400: #748b77;
+    --accent-500: #90a292;
+    --accent-600: #acb9ad;
+    --accent-700: #c7d1c9;
+    --accent-800: #e3e8e4;
+    --accent-900: #f1f3f1;
+    --accent-950: #f4f5f4;
+  }
+}

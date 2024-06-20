@@ -203,11 +203,13 @@ export default function ReviewFilmModal({
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="ghost" onPress={handleOpenClose}>
+          <Button variant="shadow" onPress={handleOpenClose}>
             Cancel
           </Button>
           <Button
             isDisabled={reviewStep <= 1}
+            color="secondary"
+            variant="shadow"
             onPress={() => {
               setReviewStep(reviewStep - 1);
             }}
@@ -216,6 +218,7 @@ export default function ReviewFilmModal({
           </Button>
           <Button
             color="primary"
+            variant="shadow"
             isDisabled={!selectedMovie || (reviewStep >= 2 && filmRating === 0)}
             onPress={() => {
               if (reviewStep >= 2) {

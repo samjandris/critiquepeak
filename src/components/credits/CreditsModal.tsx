@@ -28,7 +28,7 @@ export default function CreditsModal({
   const [modalRef, { width: modalWidth, height: modalHeight }] = useMeasure();
   const [tabsRef, { width: tabsWidth }] = useMeasure();
 
-  const castDepartments = useMemo(() => {
+  const crewDepartments = useMemo(() => {
     const departments: { [department: string]: CrewPerson[] } = {};
 
     crew.map((crewMember) => {
@@ -36,7 +36,15 @@ export default function CreditsModal({
         departments[crewMember.department] = [];
       }
 
-      if (!departments[crewMember.department].includes(crewMember)) {
+      const existingMember = departments[crewMember.department].find(
+        (member) => member.id === crewMember.id
+      );
+
+      if (existingMember) {
+        if (existingMember.job.includes(crewMember.job)) return;
+
+        existingMember.job += ' / ' + crewMember.job;
+      } else {
         departments[crewMember.department].push(crewMember);
       }
     });
@@ -83,7 +91,7 @@ export default function CreditsModal({
       }}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      className="h-[60%] max-w-screen-2xl shadow-none!"
+      className="h-[80%] max-w-screen-2xl"
     >
       <ModalContent>
         <ModalBody>
@@ -125,7 +133,7 @@ export default function CreditsModal({
                 </ScrollShadow>
               </Tab>
 
-              {Object.keys(castDepartments).map((category) => (
+              {Object.keys(crewDepartments).map((category) => (
                 <Tab key={category} title={category}>
                   <ScrollShadow
                     style={{
@@ -134,7 +142,7 @@ export default function CreditsModal({
                     }}
                     className="flex flex-col gap-4 ml-8 w-full"
                   >
-                    {castDepartments[category].map((crewMember: CrewPerson) => (
+                    {crewDepartments[category].map((crewMember: CrewPerson) => (
                       <div
                         key={crewMember.id}
                         className="flex items-center gap-4"

@@ -28,17 +28,15 @@ export default function FilmBackdrop({
             >
               <div
                 className={cn(
-                  'flex flex-col px-2 py-2 pb-1 items-start bg-gray-900 opacity-85 shadow-xl',
+                  'flex flex-col px-2 py-2 pb-1 items-start bg-secondary opacity-90 shadow-xl',
                   labelPosition === 'top' && 'rounded-tl-xl rounded-br-xl',
                   labelPosition === 'bottom' && 'rounded-bl-xl rounded-tr-xl'
                 )}
               >
-                <p className="text-white/60 text-tiny font-bold uppercase">
+                <p className="text-text-700 text-tiny font-bold uppercase">
                   Featured
                 </p>
-                <h4 className="text-white text-large font-medium">
-                  {film.title}
-                </h4>
+                <p className="text-text text-large font-medium">{film.title}</p>
               </div>
             </CardHeader>
           )}
